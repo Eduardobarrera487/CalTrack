@@ -1,6 +1,9 @@
+import Link from "next/link";
+
 export default function ReverseArrowButton({ onClick }) {
   return (
-    <button
+    <Link
+    href={"/home"}
       className="p-2 rounded-full hover:bg-gray-100 transition mb-4"
       aria-label="Volver"
       onClick={onClick}
@@ -15,6 +18,6 @@ export default function ReverseArrowButton({ onClick }) {
       >
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
       </svg>
-    </button>
+    </Link>
   );
 }

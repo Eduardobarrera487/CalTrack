@@ -1,12 +1,18 @@
+'use client';
+import { useState } from "react";
 import ReverseArrowButton from '../_components/ReverseArrowButton';
 import ThreeDotsButton from '../_components/ThreeDotsButton';
 import SendButton from '../_components/SendButton';
 import ClipButton from '../_components/ClipButton';
 import CustomFooter from '../_components/footer';
+import Sidebar from '../_components/Sidebar';
 
 export default function AiChat() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div className="flex flex-col bg-white min-h-screen p-2 pt-8 gap-3 font-[family-name:var(--font-geist-sans)]">
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <header className="flex flex-row gap-5 items-center justify-between mb-4 border-b border-gray-300 shadow-lg shadow-gray-200">
         <ReverseArrowButton />
         <nav className="flex items-center gap-3">
@@ -19,7 +25,7 @@ export default function AiChat() {
           </div>
           <h1 className="text-[1rem] font-bold text-start mb-4 text-black">Asistente de salud IA</h1>
         </nav>
-        <ThreeDotsButton />
+        <ThreeDotsButton onClick={() => setSidebarOpen(true)} />
       </header>
 
       <main className="flex-1 overflow-y-auto p-4">
