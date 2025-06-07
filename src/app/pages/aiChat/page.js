@@ -1,11 +1,11 @@
 'use client';
 import { useState } from "react";
-import ReverseArrowButton from '../_components/ReverseArrowButton';
-import ThreeDotsButton from '../_components/ThreeDotsButton';
-import SendButton from '../_components/SendButton';
-import ClipButton from '../_components/ClipButton';
-import CustomFooter from '../_components/footer';
-import Sidebar from '../_components/Sidebar';
+import ReverseArrowButton from '@/app/_components/ReverseArrowButton';
+import ThreeDotsButton from '@/app/_components/ThreeDotsButton';
+import SendButton from '@/app/_components/SendButton';
+import ClipButton from '@/app/_components/ClipButton';
+import CustomFooter from '@/app/_components/footer';
+import Sidebar from '@/app/_components/Sidebar';
 
 export default function AiChat() {
   const [sidebarOpen, setSidebarOpen] = useState(false);

@@ -22,9 +22,9 @@ export default function Login() {
                 <div className="flex justify-between items-center text-sm text-gray-600">
                     <Link href="/forgot-password" className="hover:underline">
                         ¿Olvidó su contraseña? </Link>
-                    <Link href="/register" className="hover:underline">
+                    <Link href="/pages/new-user" className="hover:underline">
                         Registrarse </Link>
-                    <Link href="/aiChat">
+                    <Link href="/pages/aiChat">
                         <span className="hover:underline">Chat with AI</span>
                     </Link>
 
