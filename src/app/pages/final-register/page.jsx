@@ -26,7 +26,7 @@ const FinalRegisterPage = () => {
 
             {/* Botón */}
             <Link
-                href="/pages/dashboard" // Cambia esto por la ruta correcta de tu siguiente página
+                href="/pages/calories" // Cambia esto por la ruta correcta de tu siguiente página
                 className="w-full text-center p-2 bg-black text-white rounded-2xl hover:bg-gray-800 transition-colors"
             >
                 Continuar

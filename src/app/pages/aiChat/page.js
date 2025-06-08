@@ -4,8 +4,8 @@ import ReverseArrowButton from '@/app/_components/ReverseArrowButton';
 import ThreeDotsButton from '@/app/_components/ThreeDotsButton';
 import SendButton from '@/app/_components/SendButton';
 import ClipButton from '@/app/_components/ClipButton';
-import CustomFooter from '@/app/_components/footer';
 import Sidebar from '@/app/_components/Sidebar';
+import BottomNavBar from "@/app/_components/BottomNavBar";
 
 export default function AiChat() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -39,7 +39,7 @@ export default function AiChat() {
         </div>
       </main>
 
-      <footer className="flex justify-center items-center mt-4 border-t-2 border-gray-300">
+      <footer className="flex justify-center items-center mt-4 border-t-2 border-gray-300 mb-15">
         <div className="p-4 rounded-lg shadow-md w-full max-w-md flex gap-2">
           <ClipButton />
           <input
@@ -50,7 +50,7 @@ export default function AiChat() {
           <SendButton />
         </div>
       </footer>
-      <CustomFooter />
+      <BottomNavBar active=""/>
     </div>
   );
 }
