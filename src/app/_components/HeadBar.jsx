@@ -13,13 +13,7 @@ export default function HeadBar({ date = 'Today, Jun 7' }) {
 
       {/* Iconos */}
       <div className="flex items-center gap-4">
-        {/* Ícono de notificación */}
-        <button
-          aria-label="Notificaciones"
-          className="w-8 h-8 rounded-full bg-blue-900 flex items-center justify-center text-white"
-        >
-          <Bell className="w-4 h-4" />
-        </button>
+        
 
         {/* Ícono de perfil */}
         <button
