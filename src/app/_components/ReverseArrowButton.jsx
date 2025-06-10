@@ -1,9 +1,9 @@
 import Link from "next/link";
 
-export default function ReverseArrowButton({ onClick }) {
+export default function ReverseArrowButton({ onClick, href}) {
   return (
     <Link
-    href={"/pages/login"}
+    href={href}
       className="p-2 rounded-full hover:bg-gray-100 transition mb-4"
       aria-label="Volver"
       onClick={onClick}
