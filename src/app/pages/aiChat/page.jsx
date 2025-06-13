@@ -14,7 +14,7 @@ export default function AiChat() {
     <div className="flex flex-col bg-white min-h-screen p-2 pt-8 gap-3 font-[family-name:var(--font-geist-sans)]">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <header className="flex flex-row gap-5 items-center justify-between mb-4 border-b border-gray-300 shadow-lg shadow-gray-200">
-        <ReverseArrowButton href="/pages/calories" />
+        <ReverseArrowButton string="/pages/calories" />
         <nav className="flex items-center gap-3">
           <div className="flex items-start justify-between mb-4">
             <img
