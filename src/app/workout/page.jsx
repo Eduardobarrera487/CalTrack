@@ -1,9 +1,27 @@
-'use client'
+"use client"
 
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import BottomNavBar from "@/app/_components/bottomNavBar"
+import { useState, useEffect } from "react"
 
 export default function ActivityDashboard() {
+  const router = useRouter()
+  const [history, setHistory] = useState([])
+
+  const goToRecipes = () => {
+    router.push('/pages/recipes')
+  }
+
+  const goToAddExercise = () => {
+    router.push('/pages/add-exercise')
+  }
+
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem("exerciseHistory")) || []
+    setHistory(stored)
+  }, [])
+
   return (
     <div className="max-w-[430px] w-full mx-auto min-h-screen pb-20 bg-white">
       <div className="p-4 space-y-4">
@@ -25,7 +43,12 @@ export default function ActivityDashboard() {
 
         <div className="flex gap-2">
           <button className="flex-1 bg-indigo-100 text-indigo-600 font-semibold py-2 rounded-xl">Entrenamientos</button>
-          <button className="flex-1 bg-gray-100 text-gray-600 font-semibold py-2 rounded-xl">Recetas</button>
+          <button
+            onClick={goToRecipes}
+            className="flex-1 bg-gray-100 text-gray-600 font-semibold py-2 rounded-xl"
+          >
+            Recetas
+          </button>
         </div>
 
         <div>
@@ -55,65 +78,36 @@ export default function ActivityDashboard() {
           </div>
         </div>
 
-        <div>
-          <h3 className="font-semibold text-lg">Rutinas de Ejercicio</h3>
-          <div className="space-y-3 mt-2">
-            <div className="bg-blue-50 p-3 rounded-xl">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="font-semibold">Correr</h4>
-                  <p className="text-sm text-gray-500">Cardio básico</p>
-                </div>
-                <div className="text-sm text-right">
-                  <p>150 cal</p>
-                  <p className="text-gray-500">30 min</p>
-                </div>
-              </div>
-              <button className="mt-2 w-full bg-blue-600 text-white py-1 rounded-lg text-sm font-medium">Agregar al total</button>
-            </div>
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg shadow-inner">
+          <h3 className="font-semibold text-lg mb-3">Ejercicios recientes</h3>
+          {history.length === 0 ? (
+            <p className="text-gray-500 text-sm">No hay ejercicios recientes.</p>
+          ) : (
+            <ul className="space-y-2 max-h-48 overflow-y-auto">
+              {history.map((item, i) => (
+                <li
+                  key={i}
+                  className="bg-white rounded-md p-3 shadow-sm border border-gray-200"
+                >
+                  <div className="flex justify-between font-semibold text-gray-700">
+                    <span>{item.type}</span>
+                    <span>{item.duration} min</span>
+                  </div>
+                  <div className="text-xs text-gray-500 flex justify-between mt-1">
+                    <span>Inicio: {item.startTime}</span>
+                    <span>Fin: {item.endTime}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
 
-            <div className="bg-red-50 p-3 rounded-xl">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="font-semibold">Pesas</h4>
-                  <p className="text-sm text-gray-500">Fuerza y resistencia</p>
-                </div>
-                <div className="text-sm text-right">
-                  <p>200 cal</p>
-                  <p className="text-gray-500">45 min</p>
-                </div>
-              </div>
-              <button className="mt-2 w-full bg-blue-600 text-white py-1 rounded-lg text-sm font-medium">Agregar al total</button>
-            </div>
-
-            <div className="bg-green-50 p-3 rounded-xl">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="font-semibold">Yoga</h4>
-                  <p className="text-sm text-gray-500">Flexibilidad y relajación</p>
-                </div>
-                <div className="text-sm text-right">
-                  <p>120 cal</p>
-                  <p className="text-gray-500">60 min</p>
-                </div>
-              </div>
-              <button className="mt-2 w-full bg-blue-600 text-white py-1 rounded-lg text-sm font-medium">Agregar al total</button>
-            </div>
-
-            <div className="bg-orange-50 p-3 rounded-xl">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="font-semibold">Ciclismo</h4>
-                  <p className="text-sm text-gray-500">Cardio intenso</p>
-                </div>
-                <div className="text-sm text-right">
-                  <p>180 cal</p>
-                  <p className="text-gray-500">40 min</p>
-                </div>
-              </div>
-              <button className="mt-2 w-full bg-blue-600 text-white py-1 rounded-lg text-sm font-medium">Agregar al total</button>
-            </div>
-          </div>
+          <button
+            onClick={goToAddExercise}
+            className="mt-4 w-full bg-indigo-600 text-white py-2 rounded-xl font-semibold hover:bg-indigo-700 transition"
+          >
+            + Agregar Ejercicio
+          </button>
         </div>
       </div>
 
