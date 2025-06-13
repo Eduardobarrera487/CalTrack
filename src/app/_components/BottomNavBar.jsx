@@ -4,10 +4,10 @@ import Link from "next/link";
 import { Home, Coffee, Dumbbell, User } from "lucide-react";
 
 const tabs = [
-  { name: "Home", href: "/", icon: Home },
-  { name: "Meals", href: "/", icon: Coffee },
-  { name: "Workouts", href: "/workout", icon: Dumbbell }, 
-  { name: "Profile", href: "/", icon: User },
+  { name: "Home", href: "/pages/calories", icon: Home },
+  { name: "Meals", href: "/pages/mealbuilder", icon: Coffee },
+  { name: "Workouts", href: "/pages/workout", icon: Dumbbell },
+  { name: "Profile", href: "/pages/userConfig", icon: User },
 ];
 
 export default function BottomNavBar({ active = "Home" }) {
