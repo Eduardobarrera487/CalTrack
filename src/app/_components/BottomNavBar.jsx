@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -7,7 +6,7 @@ import { Home, Coffee, Dumbbell, User } from "lucide-react";
 const tabs = [
   { name: "Home", href: "/", icon: Home },
   { name: "Meals", href: "/", icon: Coffee },
-  { name: "Workouts", href: "/", icon: Dumbbell },
+  { name: "Workouts", href: "/workout", icon: Dumbbell }, 
   { name: "Profile", href: "/", icon: User },
 ];
 
