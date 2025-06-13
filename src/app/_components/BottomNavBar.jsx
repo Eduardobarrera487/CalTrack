@@ -8,7 +8,7 @@ const tabs = [
   { name: "Home", href: "/pages/calories", icon: Home },
   { name: "Meals", href: "/pages/mealbuilder", icon: Coffee },
   { name: "Workouts", href: "/pages/workout", icon: Dumbbell },
-  { name: "Profile", href: "/", icon: User },
+  { name: "Profile", href: "/pages/userConfig", icon: User },
 ];
 
 export default function BottomNavBar({ active = "Home" }) {
