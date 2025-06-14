@@ -1,32 +1,73 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { Menu, Plus, Clock3, Heart, Home, Search, SquarePlus, User } from "lucide-react";
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const [activeCategory, setActiveCategory] = useState("");
+
   const [activeTab, setActiveTab] = useState("Inicio");
+
   const categories = [
-    { id: 1, label: "Todas" },
-    { id: 2, label: "Desarrollador" },
-    { id: 3, label: "Usuarios" },
-    { id: 4, label: "IA" },
+    { id: 1, label: "Entrenamiento", href: "/pages/workout" },
+    { id: 2, label: "Recetas", href: "/pages/recipes" },
   ];
+
+  useEffect(() => {
+    if (pathname.startsWith("/pages/workout")) {
+      setActiveCategory("Entrenamiento");
+      setActiveTab(""); 
+    } else if (pathname.startsWith("/pages/recipes")) {
+      setActiveCategory("Recetas");
+      setActiveTab("");
+    } else if (pathname === "/pages/calories") {
+      setActiveCategory("");
+      setActiveTab("Inicio");
+    } else if (pathname === "/pages/search") {
+      setActiveCategory("");
+      setActiveTab("Buscar");
+    } else if (pathname === "/pages/create") {
+      setActiveCategory("");
+      setActiveTab("Crear");
+    } else if (pathname === "/") {
+      setActiveCategory("");
+      setActiveTab("Perfil");
+    } else {
+      setActiveCategory("");
+      setActiveTab("");
+    }
+  }, [pathname]);
+
+  const handleCategoryClick = (category) => {
+    setActiveCategory(category.label);
+    router.push(category.href);
+  };
+
+  const handleTabClick = (tabName, href) => {
+    setActiveTab(tabName);
+    if (href) router.push(href);
+  };
 
   return (
     <div className="relative mx-auto max-w-xs min-h-screen bg-gray-100 shadow-lg flex flex-col overflow-hidden">
-      
       <header className="flex items-center justify-between px-4 py-3 bg-white border-b">
         <h1 className="text-lg font-bold text-amber-600">CalTrack</h1>
         <Menu className="w-5 h-5 text-gray-700" />
       </header>
 
-      
       <section className="flex gap-2 overflow-x-auto px-4 py-3 bg-white border-b no-scrollbar">
         {categories.map((cat) => (
           <button
             key={cat.id}
-            onClick={() => {}}
-            className={`whitespace-nowrap px-4 py-1 rounded-full text-sm font-medium border ${
-              cat.id === 1 ? "bg-amber-600 text-white" : "bg-gray-100 text-gray-700"
+            onClick={() => handleCategoryClick(cat)}
+            className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold border transition ${
+              activeCategory === cat.label
+                ? "bg-amber-600 text-white border-amber-600"
+                : "bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200"
             }`}
           >
             {cat.label}
@@ -34,7 +75,6 @@ export default function HomeScreen() {
         ))}
       </section>
 
-      
       <button className="absolute left-2 top-1/2 -translate-y-1/2 bg-violet-500 hover:bg-violet-600 text-white rounded-full p-1.5 shadow-md">
         <Plus className="w-5 h-5" />
       </button>
@@ -42,9 +82,7 @@ export default function HomeScreen() {
         <Plus className="w-5 h-5" />
       </button>
 
-      
       <main className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
-    
         <article className="bg-white rounded-xl shadow overflow-hidden">
           <div className="relative h-48 w-full">
             <img
@@ -78,9 +116,7 @@ export default function HomeScreen() {
           </div>
         </article>
 
-        
         <div className="grid grid-cols-2 gap-4">
-          
           <article className="bg-white rounded-lg shadow overflow-hidden flex flex-col">
             <div className="relative h-24 w-full">
               <img
@@ -96,7 +132,7 @@ export default function HomeScreen() {
               </div>
             </div>
           </article>
-          
+
           <article className="bg-white rounded-lg shadow overflow-hidden flex flex-col">
             <div className="relative h-24 w-full">
               <img
@@ -115,26 +151,36 @@ export default function HomeScreen() {
         </div>
       </main>
 
-      
       <nav className="bg-white border-t p-2 flex justify-between text-xs text-gray-600">
-        <button onClick={() => setActiveTab("Inicio")} className="flex flex-col items-center flex-1 gap-0.5">
+        <button
+          onClick={() => handleTabClick("Inicio", "/pages/calories")}
+          className="flex flex-col items-center flex-1 gap-0.5"
+        >
           <Home className={`w-5 h-5 ${activeTab === "Inicio" ? "text-amber-600" : ""}`} />
           Inicio
         </button>
-        <button onClick={() => setActiveTab("Buscar")} className="flex flex-col items-center flex-1 gap-0.5">
-          <Search className="w-5 h-5" />
+        <button
+          onClick={() => handleTabClick("Buscar", "/pages/search")}
+          className="flex flex-col items-center flex-1 gap-0.5"
+        >
+          <Search className={`w-5 h-5 ${activeTab === "Buscar" ? "text-amber-600" : ""}`} />
           Buscar
         </button>
-        <button onClick={() => setActiveTab("Crear")} className="flex flex-col items-center flex-1 gap-0.5">
-          <SquarePlus className="w-5 h-5" />
+        <button
+          onClick={() => handleTabClick("Crear", "/pages/create")}
+          className="flex flex-col items-center flex-1 gap-0.5"
+        >
+          <SquarePlus className={`w-5 h-5 ${activeTab === "Crear" ? "text-amber-600" : ""}`} />
           Crear
         </button>
-        <button onClick={() => setActiveTab("Perfil")} className="flex flex-col items-center flex-1 gap-0.5">
-          <User className="w-5 h-5" />
+        <button
+          onClick={() => handleTabClick("Perfil", "/")}
+          className="flex flex-col items-center flex-1 gap-0.5"
+        >
+          <User className={`w-5 h-5 ${activeTab === "Perfil" ? "text-amber-600" : ""}`} />
           Perfil
         </button>
       </nav>
     </div>
   );
 }
-

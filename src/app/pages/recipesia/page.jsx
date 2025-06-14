@@ -1,10 +1,26 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
-import { Search, Star, Heart } from 'lucide-react'
-import BottomNavBar from '@/app/_components/bottomNavBar'
+import Image from "next/image";
+import { Search, Star, Heart } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import BottomNavBar from "@/app/_components/bottomNavBar";
 
 export default function RecetasIA() {
+  const [activeCategory, setActiveCategory] = useState("Todas");
+  const router = useRouter();
+
+  const categories = ["Todas", "Usuarios", "Desarrollador"];
+
+  const handleCategoryClick = (cat) => {
+    if (cat === "Todas") {
+      router.push('/pages/recipes')
+;
+    } else {
+      setActiveCategory(cat);
+    }
+  };
+
   return (
     <div className="max-w-[430px] w-full mx-auto min-h-screen pb-16 bg-white px-4 pt-4 space-y-4">
       <div className="flex justify-between items-center">
@@ -27,9 +43,19 @@ export default function RecetasIA() {
       </div>
 
       <div className="flex gap-2">
-        <button className="flex-1 bg-gray-100 text-sm py-1 rounded-full font-medium">Todas</button>
-        <button className="flex-1 bg-gray-100 text-sm py-1 rounded-full font-medium">Usuarios</button>
-        <button className="flex-1 bg-gray-100 text-sm py-1 rounded-full font-medium">Chef</button>
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => handleCategoryClick(cat)}
+            className={`flex-1 text-sm py-1 rounded-full font-medium border ${
+              activeCategory === cat
+                ? "bg-amber-600 text-white border-amber-600"
+                : "bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200"
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
       </div>
 
       <div className="relative">
@@ -52,7 +78,9 @@ export default function RecetasIA() {
               height={200}
               className="rounded-xl w-full h-40 object-cover"
             />
-            <div className="absolute top-2 left-2 bg-green-600 text-white text-xs px-2 py-0.5 rounded-full">IA</div>
+            <div className="absolute top-2 left-2 bg-green-600 text-white text-xs px-2 py-0.5 rounded-full">
+              IA
+            </div>
             <div className="absolute top-2 right-2 bg-white rounded-full p-1">
               <Heart className="w-4 h-4 text-gray-500" />
             </div>
@@ -69,10 +97,18 @@ export default function RecetasIA() {
             </div>
             <div className="flex items-center justify-between mt-2">
               <div className="flex items-center gap-2 text-xs">
-                <Image src="/chef.jpg" alt="Chef" width={20} height={20} className="rounded-full" />
-                <span>Chef AI</span>
+                <Image
+                  src="/developer.jpg"
+                  alt="Desarrollador"
+                  width={20}
+                  height={20}
+                  className="rounded-full"
+                />
+                <span>Desarrollador AI</span>
               </div>
-              <button className="bg-orange-500 text-white text-xs px-3 py-1 rounded-full">Ver Receta</button>
+              <button className="bg-orange-500 text-white text-xs px-3 py-1 rounded-full">
+                Ver Receta
+              </button>
             </div>
           </div>
         </div>
@@ -81,10 +117,18 @@ export default function RecetasIA() {
       <div>
         <h2 className="text-sm font-semibold mb-2">Categorías</h2>
         <div className="flex gap-2 overflow-x-auto no-scrollbar">
-          <div className="bg-yellow-100 text-yellow-800 text-xs px-3 py-2 rounded-xl font-semibold">Italiana</div>
-          <div className="bg-red-100 text-red-800 text-xs px-3 py-2 rounded-xl font-semibold">Mexicana</div>
-          <div className="bg-green-100 text-green-800 text-xs px-3 py-2 rounded-xl font-semibold">Saludable</div>
-          <div className="bg-blue-100 text-blue-800 text-xs px-3 py-2 rounded-xl font-semibold">Mariscos</div>
+          <div className="bg-yellow-100 text-yellow-800 text-xs px-3 py-2 rounded-xl font-semibold">
+            Italiana
+          </div>
+          <div className="bg-red-100 text-red-800 text-xs px-3 py-2 rounded-xl font-semibold">
+            Mexicana
+          </div>
+          <div className="bg-green-100 text-green-800 text-xs px-3 py-2 rounded-xl font-semibold">
+            Saludable
+          </div>
+          <div className="bg-blue-100 text-blue-800 text-xs px-3 py-2 rounded-xl font-semibold">
+            Mariscos
+          </div>
         </div>
       </div>
 
@@ -96,7 +140,13 @@ export default function RecetasIA() {
 
         <div className="space-y-2">
           <div className="flex gap-3 items-center">
-            <Image src="/galletas.jpg" alt="Galletas" width={48} height={48} className="rounded-lg" />
+            <Image
+              src="/galletas.jpg"
+              alt="Galletas"
+              width={48}
+              height={48}
+              className="rounded-lg"
+            />
             <div className="flex-1">
               <div className="text-sm font-medium">Galletas de Chocolate</div>
               <div className="text-xs text-gray-500">30 min · 4.5</div>
@@ -105,7 +155,13 @@ export default function RecetasIA() {
           </div>
 
           <div className="flex gap-3 items-center">
-            <Image src="/ensalada.jpg" alt="Ensalada" width={48} height={48} className="rounded-lg" />
+            <Image
+              src="/ensalada.jpg"
+              alt="Ensalada"
+              width={48}
+              height={48}
+              className="rounded-lg"
+            />
             <div className="flex-1">
               <div className="text-sm font-medium">Ensalada Mediterránea</div>
               <div className="text-xs text-gray-500">15 min · 4.9</div>
@@ -114,7 +170,13 @@ export default function RecetasIA() {
           </div>
 
           <div className="flex gap-3 items-center">
-            <Image src="/pizza.jpg" alt="Pizza" width={48} height={48} className="rounded-lg" />
+            <Image
+              src="/pizza.jpg"
+              alt="Pizza"
+              width={48}
+              height={48}
+              className="rounded-lg"
+            />
             <div className="flex-1">
               <div className="text-sm font-medium">Pizza Casera</div>
               <div className="text-xs text-gray-500">45 min · 4.7</div>
@@ -126,5 +188,5 @@ export default function RecetasIA() {
 
       <BottomNavBar />
     </div>
-  )
+  );
 }
