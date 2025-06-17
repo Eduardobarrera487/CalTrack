@@ -1,7 +1,8 @@
-"use client"
+'use client'
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { ArrowLeft } from "lucide-react"  // Usamos lucide-react para la flecha
 
 export default function AddExercisePage() {
   const router = useRouter()
@@ -35,6 +36,16 @@ export default function AddExercisePage() {
 
   return (
     <div className="max-w-[430px] mx-auto p-6 min-h-screen bg-white">
+      {/* Flecha para regresar */}
+      <button
+        onClick={() => router.push("/pages/workout")}
+        className="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 mb-6"
+        aria-label="Regresar"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        <span className="text-sm font-medium">Volver</span>
+      </button>
+
       <h1 className="text-2xl font-bold mb-6">Agregar Ejercicio</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
