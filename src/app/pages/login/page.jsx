@@ -33,7 +33,7 @@ export default function Login() {
                 <CustomButton className="w-full" text="Ingresar" onClick = {handleLogin}/>
 
                 <div className="flex justify-between items-center text-sm text-gray-600">
-                    <Link href="/forgot-password" className="hover:underline">
+                    <Link href="/pages/forgot-password" className="hover:underline">
                         ¿Olvidó su contraseña? </Link>
                     <Link href="/pages/new-user" className="hover:underline">
                         Registrarse </Link>
