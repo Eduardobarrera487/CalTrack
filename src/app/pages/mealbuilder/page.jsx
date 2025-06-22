@@ -1,32 +1,52 @@
-
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { Search, ShoppingBasket, CloudSun } from 'lucide-react'
 import BottomNavBar from '@/app/_components/bottomNavBar'
 import { useCartStore } from '../../_store/cartStore'
 
 export default function MealBuilder() {
   const router = useRouter()
-  const { items, addItem, removeItemByName, updateItemQuantity } = useCartStore()
+  const { items, addItem } = useCartStore()
+
+  const [selectedItem, setSelectedItem] = useState(null)
+  const [showDetails, setShowDetails] = useState(false)
+  const [size, setSize] = useState('')
+  const [calories, setCalories] = useState('')
+  const [protein, setProtein] = useState('')
+  const [carbs, setCarbs] = useState('')
+  const [fats, setFats] = useState('')
+
+  const handleOpenDetails = (item) => {
+    setSelectedItem(item)
+    setShowDetails(true)
+  }
+
+  const handleSave = () => {
+    if (!selectedItem) return
+
+    const newItem = {
+      name: selectedItem.name,
+      size,
+      calories,
+      protein,
+      carbs,
+      fats,
+      quantity: 1,
+    }
+
+    addItem(newItem)
+    setShowDetails(false)
+    setSize('')
+    setCalories('')
+    setProtein('')
+    setCarbs('')
+    setFats('')
+  }
 
   const goToCart = () => {
     router.push('/pages/basket')
-  }
-
-  const handleAdd = (item) => {
-    addItem(item)
-  }
-
-  const handleRemove = (item) => {
-    const exists = items.find(i => i.name === item.name)
-    if (!exists) return
-
-    if (exists.quantity === 1) {
-      removeItemByName(item.name)
-    } else {
-      updateItemQuantity(item.name, exists.quantity - 1)
-    }
   }
 
   const itemList = [
@@ -67,7 +87,9 @@ export default function MealBuilder() {
           <button
             key={i}
             className={`px-3 py-1 rounded-full text-sm font-medium ${
-              i === 0 ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-500'
+              i === 0
+                ? 'bg-[#173A8C] text-white'
+                : 'bg-gray-100 text-gray-500'
             }`}
           >
             {cat}
@@ -76,45 +98,83 @@ export default function MealBuilder() {
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-20">
-        {itemList.map((item, index) => {
-          const existingItem = items.find(i => i.name === item.name)
-          const quantity = existingItem?.quantity || 0
-
-          return (
-            <div
-              key={index}
-              className="bg-gray-50 rounded-xl shadow-sm p-3 flex flex-col items-center text-center"
+        {itemList.map((item, index) => (
+          <div
+            key={index}
+            className="bg-gray-50 rounded-xl shadow-sm p-3 flex flex-col items-center text-center"
+          >
+            <img
+              src={item.img}
+              alt={item.name}
+              className="w-20 h-20 object-contain mb-2"
+            />
+            <p className="font-medium text-sm text-gray-800">{item.name}</p>
+            <button
+              className="mt-2 bg-[#173A8C] text-white text-sm px-4 py-1 rounded-md font-semibold hover:bg-[#102b66]"
+              onClick={() => handleOpenDetails(item)}
             >
-              <img
-                src={item.img}
-                alt={item.name}
-                className="w-20 h-20 object-contain mb-2"
-              />
-              <p className="font-medium text-sm text-gray-800">{item.name}</p>
-
-              <div className="flex items-center gap-2 mt-2">
-                <button
-                  className="bg-gray-300 text-black w-6 h-6 rounded-full text-sm font-bold"
-                  onClick={() => handleRemove(item)}
-                >
-                  −
-                </button>
-                <span className="text-sm w-6 text-center">{quantity}</span>
-                <button
-                  className="bg-yellow-500 text-white w-6 h-6 rounded-full text-sm font-bold hover:bg-yellow-600"
-                  onClick={() => handleAdd(item)}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-          )
-        })}
+              Agregar
+            </button>
+          </div>
+        ))}
       </div>
 
-      <button className="absolute bottom-24 right-6 bg-yellow-500 text-white font-semibold px-4 py-2 rounded-md shadow hover:bg-yellow-600">
+      <button className="absolute bottom-24 right-6 bg-[#173A8C] text-white font-semibold px-4 py-2 rounded-md shadow hover:bg-[#102b66]">
         confirmar
       </button>
+
+      {showDetails && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-xl p-6 w-11/12 max-w-sm">
+            <h2 className="text-lg font-semibold mb-4">
+              {selectedItem?.name} - Detalles
+            </h2>
+
+            <input
+              type="text"
+              placeholder="Tamaño (ej. 100g, 1 taza)"
+              className="w-full mb-2 p-2 border rounded-md text-sm"
+              value={size}
+              onChange={(e) => setSize(e.target.value)}
+            />
+            <input
+              type="number"
+              placeholder="Calorías"
+              className="w-full mb-2 p-2 border rounded-md text-sm"
+              value={calories}
+              onChange={(e) => setCalories(e.target.value)}
+            />
+            <input
+              type="number"
+              placeholder="Proteínas (g)"
+              className="w-full mb-2 p-2 border rounded-md text-sm"
+              value={protein}
+              onChange={(e) => setProtein(e.target.value)}
+            />
+            <input
+              type="number"
+              placeholder="Carbohidratos (g)"
+              className="w-full mb-2 p-2 border rounded-md text-sm"
+              value={carbs}
+              onChange={(e) => setCarbs(e.target.value)}
+            />
+            <input
+              type="number"
+              placeholder="Grasas (g)"
+              className="w-full mb-2 p-2 border rounded-md text-sm"
+              value={fats}
+              onChange={(e) => setFats(e.target.value)}
+            />
+
+            <button
+              className="w-full mt-4 bg-[#173A8C] text-white py-2 rounded-md font-semibold hover:bg-[#102b66]"
+              onClick={handleSave}
+            >
+              Guardar
+            </button>
+          </div>
+        </div>
+      )}
 
       <BottomNavBar />
     </div>
