@@ -16,15 +16,17 @@ const ForgotPasswordPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
-      <CaltrackLogo className="mb-8" />
-      <button
-        className="self-start mb-8 flex items-center gap-2 text-gray-600 hover:text-gray-900"
-        onClick={() => router.back()}
-        aria-label="Go back"
-      >
-        <ArrowLeft size={24} />
-        <span>Regresar</span>
-      </button>
+      <div className="w-full max-w-md flex flex-col items-center relative mb-8">
+        <button
+          className="absolute left-0 top-1 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+          onClick={() => router.back()}
+          aria-label="Go back"
+        >
+          <ArrowLeft size={24} />
+          <span>Regresar</span>
+        </button>
+        <CaltrackLogo className="mx-auto" />
+      </div>
       <div className="w-full max-w-md bg-white p-8 rounded shadow">
         <h1 className="text-2xl font-bold mb-4 text-center text-black">Olvidé mi contraseña</h1>
         <p className="mb-6 text-gray-600 text-center">
