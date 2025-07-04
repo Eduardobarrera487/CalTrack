@@ -2,11 +2,6 @@
 import { Bell, User } from 'lucide-react';
 
 export default function HeadBar({ date = 'Today, Jun 7'}) {
-   const handleUser = (e) => {
-        e.preventDefault();
-        // Perform login logic here if needed
-        router.push('/pages/userConfig'); // Replace with your desired path
-    };
   return (
     <header className="w-full max-w-md px-6 py-4 bg-white border-b border-gray-100 flex items-center justify-between">
       {/* Logo y Fecha */}
@@ -18,7 +13,6 @@ export default function HeadBar({ date = 'Today, Jun 7'}) {
       {/* Iconos */}
       <div className="flex items-center gap-4">
         
-
         {/* Ícono de perfil */}
         <button
           onClick={(e) => {e.preventDefault(); window.location.href = '/pages/userConfig';}}
