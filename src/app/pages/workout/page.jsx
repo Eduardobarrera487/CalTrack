@@ -1,8 +1,7 @@
 "use client"
 
-import Image from "next/image"
 import { useRouter } from "next/navigation"
-import BottomNavBar from "@/app/_components/bottomNavBar"
+import BottomNavBar from "@/app/_components/BottomNavBar"
 import { useState, useEffect } from "react"
 
 export default function ActivityDashboard() {
@@ -26,10 +25,8 @@ export default function ActivityDashboard() {
     <div className="max-w-[430px] w-full mx-auto min-h-screen pb-20 bg-white">
       <div className="p-4 space-y-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold">CalTrack</h1>
-          <div className="w-9 h-9 rounded-full overflow-hidden">
-            <Image src="/user.jpg" alt="Perfil" width={36} height={36} />
-          </div>
+          <h1 className="text-xl font-bold text-black">CalTrack</h1>
+          
         </div>
 
         <div className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-2xl p-4 shadow">
@@ -52,7 +49,7 @@ export default function ActivityDashboard() {
         </div>
 
         <div>
-          <h3 className="font-semibold text-lg">Recomendados por IA</h3>
+          <h3 className="font-semibold text-lg text-black">Recomendados por IA</h3>
           <div className="space-y-3 mt-2">
             <div className="bg-pink-100 p-4 rounded-xl">
               <div className="flex justify-between items-center">
@@ -79,7 +76,7 @@ export default function ActivityDashboard() {
         </div>
 
         <div className="mt-6 p-4 bg-gray-50 rounded-lg shadow-inner">
-          <h3 className="font-semibold text-lg mb-3">Ejercicios recientes</h3>
+          <h3 className="font-semibold text-lg mb-3 text-black">Ejercicios recientes</h3>
           {history.length === 0 ? (
             <p className="text-gray-500 text-sm">No hay ejercicios recientes.</p>
           ) : (
@@ -111,7 +108,7 @@ export default function ActivityDashboard() {
         </div>
       </div>
 
-      <BottomNavBar />
+      <BottomNavBar active="Workouts"/>
     </div>
   )
 }

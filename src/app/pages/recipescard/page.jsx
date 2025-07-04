@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { Heart } from "lucide-react"
-import BottomNavBar from "@/app/_components/bottomNavBar"
+import BottomNavBar from "@/app/_components/BottomNavBar"
 
 export default function RecipeCard() {
   return (

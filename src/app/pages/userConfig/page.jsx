@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import ReverseArrowButton from "@/app/_components/ReverseArrowButton";
-import ThreeDotsButton from "@/app/_components/ThreeDotsButton";
 import Sidebar from "@/app/_components/Sidebar";
 import CustomButton from "@/app/_components/button";
 import CustomInput from "@/app/_components/input";
@@ -85,7 +84,7 @@ export default function UserConfig() {
           </form>
         </section>
       </main>
-        <BottomNavBar />
+        <BottomNavBar active="Profile"/>
     </div>
   );
 }

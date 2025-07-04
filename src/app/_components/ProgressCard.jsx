@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 
 export default function ProgressCard() {
   return (
-    <div className="w-full bg-white rounded-lg outline outline-1 outline-gray-200 p-4 space-y-4">
+    <div className="w-full bg-white rounded-lg outline  outline-gray-200 p-4 space-y-4">
       {/* Título + flecha */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-medium text-gray-900">Progress</h2>
@@ -29,7 +29,7 @@ export default function ProgressCard() {
       {/* Subtarjetas */}
       <div className="grid grid-cols-2 gap-4">
         {/* Calorías */}
-        <div className="bg-white rounded-lg outline outline-1 outline-gray-200 p-4 space-y-2">
+        <div className="bg-white rounded-lg outline  outline-gray-200 p-4 space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-3.5 h-4 bg-orange-500 rounded" />
             <span className="text-sm text-gray-500">Burned</span>
@@ -38,7 +38,7 @@ export default function ProgressCard() {
         </div>
 
         {/* Agua */}
-        <div className="bg-white rounded-lg outline outline-1 outline-gray-200 p-4 space-y-2">
+        <div className="bg-white rounded-lg outline  outline-gray-200 p-4 space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-3 h-4 bg-blue-500 rounded" />
             <span className="text-sm text-gray-500">Water</span>

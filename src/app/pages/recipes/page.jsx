@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Menu, Plus, Clock3, Heart, Home, Search, SquarePlus, User } from "lucide-react";
+import { Plus, Clock3, Heart } from "lucide-react";
+import BottomNavBar from "@/app/_components/BottomNavBar";
+
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -24,7 +26,7 @@ export default function HomeScreen() {
     } else if (pathname.startsWith("/pages/recipes")) {
       setActiveCategory("Recetas");
       setActiveTab("");
-    } else if (pathname === "/pages/calories") {
+    } /*else if (pathname === "/pages/calories") {
       setActiveCategory("");
       setActiveTab("Inicio");
     } else if (pathname === "/pages/search") {
@@ -39,7 +41,7 @@ export default function HomeScreen() {
     } else {
       setActiveCategory("");
       setActiveTab("");
-    }
+    }*/
   }, [pathname]);
 
   const handleCategoryClick = (category) => {
@@ -53,10 +55,10 @@ export default function HomeScreen() {
   };
 
   return (
-    <div className="relative mx-auto max-w-xs min-h-screen bg-gray-100 shadow-lg flex flex-col overflow-hidden">
+    <div className="relative w-full min-h-screen bg-gray-100 flex flex-col overflow-hidden">
       <header className="flex items-center justify-between px-4 py-3 bg-white border-b">
         <h1 className="text-lg font-bold text-amber-600">CalTrack</h1>
-        <Menu className="w-5 h-5 text-gray-700" />
+        
       </header>
 
       <section className="flex gap-2 overflow-x-auto px-4 py-3 bg-white border-b no-scrollbar">
@@ -151,36 +153,8 @@ export default function HomeScreen() {
         </div>
       </main>
 
-      <nav className="bg-white border-t p-2 flex justify-between text-xs text-gray-600">
-        <button
-          onClick={() => handleTabClick("Inicio", "/pages/calories")}
-          className="flex flex-col items-center flex-1 gap-0.5"
-        >
-          <Home className={`w-5 h-5 ${activeTab === "Inicio" ? "text-amber-600" : ""}`} />
-          Inicio
-        </button>
-        <button
-          onClick={() => handleTabClick("Buscar", "/pages/search")}
-          className="flex flex-col items-center flex-1 gap-0.5"
-        >
-          <Search className={`w-5 h-5 ${activeTab === "Buscar" ? "text-amber-600" : ""}`} />
-          Buscar
-        </button>
-        <button
-          onClick={() => handleTabClick("Crear", "/pages/create")}
-          className="flex flex-col items-center flex-1 gap-0.5"
-        >
-          <SquarePlus className={`w-5 h-5 ${activeTab === "Crear" ? "text-amber-600" : ""}`} />
-          Crear
-        </button>
-        <button
-          onClick={() => handleTabClick("Perfil", "/")}
-          className="flex flex-col items-center flex-1 gap-0.5"
-        >
-          <User className={`w-5 h-5 ${activeTab === "Perfil" ? "text-amber-600" : ""}`} />
-          Perfil
-        </button>
-      </nav>
+      <BottomNavBar active="Workouts" />
+      
     </div>
   );
 }
