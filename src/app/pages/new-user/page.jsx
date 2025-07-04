@@ -1,47 +1,182 @@
-import React from 'react';
+"use client";
+import React, { useState } from 'react';
 import CustomInput from '@/app/_components/input';
-import CustomButton from '@/app/_components/button';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { createClient } from '../../../../utils/supabase/client';
 
-const newUser = () => {
+const NewUser = () => {
+    const [form, setForm] = useState({
+        nombre: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        peso: "",
+        altura: "",
+        edad: "",
+        objetivo: "",
+    });
+    const [error, setError] = useState(null);
+    const [emailError, setEmailError] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
+
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+        if (e.target.name === "email") {
+            setEmailError(false);
+        }
+    };
+
+    const validateEmail = (email) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError(null);
+
+        console.log("Email entre barras: /" + form.email + "/");
+
+        if (!validateEmail(form.email.trim())) {
+            setEmailError(true);
+            setError("Por favor ingrese un correo válido.");
+            return;
+        }
+
+        if (form.password !== form.confirmPassword) {
+            setError("Las contraseñas no coinciden.");
+            return;
+        }
+
+        setLoading(true);
+        const supabase = createClient();
+
+        const { data, error: signUpError } = await supabase.auth.signUp({
+            email: form.email,
+            password: form.password,
+        });
+
+        if (signUpError) {
+            setError(signUpError.message);
+            setLoading(false);
+            return;
+        }
+
+        const userId = data.user.id;
+        const { error: profileError } = await supabase.from("perfiles").insert([
+            {
+                id: userId,
+                nombre: form.nombre,
+                edad: Number(form.edad),
+                peso: Number(form.peso),
+                altura: Number(form.altura),
+                objetivo: form.objetivo,
+                genero: null,
+                actividad_fisica: null,
+                preferencias: null,
+                restricciones: null,
+            },
+        ]);
+
+        if (profileError) {
+            setError(profileError.message);
+            setLoading(false);
+            return;
+        }
+
+        setLoading(false);
+        router.push("/pages/user-details");
+    };
+
     return (
         <div className='flex flex-col items-center justify-center bg-white min-h-screen p-8 gap-8 font-[family-name:var(--font-geist-sans)]'>
             <h1 className="text-2xl font-bold mb-4 text-black">Crea tu cuenta</h1>
-            <form>
+            <form onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-4 max-w-sm w-full">
                     <CustomInput
                         type="text"
                         placeholder="Nombre"
-                        className="w-full" />
-                    <CustomInput
-                        type="text"
+                        className="w-full"
+                        name="nombre"
+                        value={form.nombre}
+                        onChange={handleChange}
+                        required
+                    />
+                    <input
+                        type="email"
                         placeholder="Email"
-                        className="w-full" />
+                        className={`w-full ${emailError ? "border-red-500" : ""}`}
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        required
+                    />
+                    {emailError && (
+                        <span className="text-red-500 text-sm">Ingrese un correo válido</span>
+                    )}
                     <CustomInput
                         type="password"
                         placeholder="Contraseña"
-                        className="w-full" />
+                        className="w-full"
+                        name="password"
+                        value={form.password}
+                        onChange={handleChange}
+                        required
+                    />
                     <CustomInput
                         type="password"
                         placeholder="Confirmar contraseña"
-                        className="w-full" />
+                        className="w-full"
+                        name="confirmPassword"
+                        value={form.confirmPassword}
+                        onChange={handleChange}
+                        required
+                    />
                     <CustomInput
                         type="text"
                         placeholder="Peso en LBS"
-                        className="w-full" />
+                        className="w-full"
+                        name="peso"
+                        value={form.peso}
+                        onChange={handleChange}
+                        required
+                    />
                     <CustomInput
                         type="text"
                         placeholder="Altura en CM"
-                        className="w-full" />
+                        className="w-full"
+                        name="altura"
+                        value={form.altura}
+                        onChange={handleChange}
+                        required
+                    />
                     <CustomInput
                         type="text"
                         placeholder="Edad"
-                        className="w-full" />
+                        className="w-full"
+                        name="edad"
+                        value={form.edad}
+                        onChange={handleChange}
+                        required
+                    />
                     <CustomInput
                         type="text"
                         placeholder="Objetivo"
-                        className="w-full" />
-                    <Link href="/pages/user-details" className="w-full text-center p-2 bg-black text-white rounded-2xl hover:bg-gray-800 transition-colors">Registrarse</Link>
+                        className="w-full"
+                        name="objetivo"
+                        value={form.objetivo}
+                        onChange={handleChange}
+                        required
+                    />
+                    {error && <div className="text-red-500 text-center">{error}</div>}
+                    <button
+                        type="submit"
+                        className="w-full text-center p-2 bg-black text-white rounded-2xl hover:bg-gray-800 transition-colors"
+                        disabled={loading}
+                    >
+                        {loading ? "Registrando..." : "Registrarse"}
+                    </button>
                 </div>
             </form>
             <Link href="/pages/login" className="text-blue-500 hover:underline flex items-center gap-2 mt-4">
@@ -51,7 +186,7 @@ const newUser = () => {
     );
 };
 
-export default newUser;
+export default NewUser;
 
 
 // This code defines a simple React component for a new user registration page.
