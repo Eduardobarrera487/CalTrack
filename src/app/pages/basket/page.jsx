@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '../../_store/cartStore'
 import { ArrowLeft, Trash2 } from 'lucide-react'
-import BottomNavBar from '@/app/_components/bottomNavBar'
+import BottomNavBar from '@/app/_components/BottomNavBar'
 
 export default function Basket() {
   const router = useRouter()

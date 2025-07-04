@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Search, ShoppingBasket, CloudSun } from 'lucide-react'
-import BottomNavBar from '@/app/_components/bottomNavBar'
+import BottomNavBar from '@/app/_components/BottomNavBar'
 import { useCartStore } from '../../_store/cartStore'
 
 export default function MealBuilder() {
@@ -59,7 +59,7 @@ export default function MealBuilder() {
   return (
     <div className="max-w-[430px] w-full mx-auto min-h-screen px-4 pt-6 pb-24 bg-white relative">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold lowercase">desayuno</h1>
+        <h1 className="text-xl font-bold lowercase text-black">desayuno</h1>
         <div className="relative cursor-pointer" onClick={goToCart}>
           <ShoppingBasket className="w-6 h-6 text-black" />
           <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-semibold">
@@ -70,7 +70,7 @@ export default function MealBuilder() {
 
       <div className="flex items-center gap-2 text-gray-800 mb-4">
         <CloudSun className="w-6 h-6 text-yellow-400" />
-        <span className="text-sm font-medium">seleccionar ingredientes</span>
+        <span className="text-sm font-medium text-black">seleccionar ingredientes</span>
       </div>
 
       <div className="flex items-center border rounded-full px-3 py-1 mb-4">
@@ -176,7 +176,7 @@ export default function MealBuilder() {
         </div>
       )}
 
-      <BottomNavBar />
+      <BottomNavBar active='Meals' />
     </div>
   )
 }

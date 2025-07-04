@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Search, Star, Heart } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import BottomNavBar from "@/app/_components/bottomNavBar";
+import BottomNavBar from "@/app/_components/BottomNavBar";
 
 export default function RecetasIA() {
   const [activeCategory, setActiveCategory] = useState("Todas");

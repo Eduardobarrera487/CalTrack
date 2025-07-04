@@ -43,7 +43,7 @@ export default function WeightChart() {
       </div>
 
       {/* Gráfica */}
-      <div className="w-80 h-72 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 p-4">
+      <div className="w-80 h-72 bg-white rounded-lg outline  outline-offset-[-1px] outline-gray-200 p-4">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={mockData[selected]}>
             <CartesianGrid strokeDasharray="3 3" />

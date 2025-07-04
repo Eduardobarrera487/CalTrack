@@ -16,7 +16,7 @@ export default function WeightHistory() {
         {weightData.map((entry, idx) => (
           <div
             key={idx}
-            className="w-full h-20 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 px-4 py-3 flex items-center justify-between"
+            className="w-full h-20 bg-white rounded-lg outline  outline-offset-[-1px] outline-gray-200 px-4 py-3 flex items-center justify-between"
           >
             <div className="flex flex-col">
               <span className="text-base font-medium text-gray-900 leading-normal">{entry.weight}</span>

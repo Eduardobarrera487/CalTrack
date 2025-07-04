@@ -2,7 +2,7 @@
 
 export default function WeightStats() {
   return (
-    <div className="w-80 h-20 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 p-4 flex items-center justify-between">
+    <div className="w-80 h-20 bg-white rounded-lg outline  outline-offset-[-1px] outline-gray-200 p-4 flex items-center justify-between">
       {/* Peso actual */}
       <div className="flex flex-col items-center justify-center w-24">
         <span className="text-gray-600 text-sm font-normal leading-tight">Peso actual</span>
