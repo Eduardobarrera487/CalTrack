@@ -37,6 +37,9 @@ const NewUser = () => {
         setError(null);
 
         console.log("Email entre barras: /" + form.email + "/");
+        console.log("Password entre barras: /" + form.password + "/");
+        console.log("Confirm Password entre barras: /" + form.confirmPassword + "/");
+        
 
         if (!validateEmail(form.email.trim())) {
             setEmailError(true);
