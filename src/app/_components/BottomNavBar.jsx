@@ -5,7 +5,7 @@ import { Home, Coffee, Dumbbell, User, Bot } from "lucide-react";
 
 const tabs = [
   { name: "Home", href: "/pages/calories", icon: Home },
-  { name: "Meals", href: "/pages/mealbuilder", icon: Coffee },
+  { name: "Meals", href: "/pages/diary", icon: Coffee },
   { name: "Workouts", href: "/pages/workout", icon: Dumbbell },
   { name: "IA Chat", href: "/pages/aiChat", icon: Bot },
   { name: "Profile", href: "/pages/userConfig", icon: User },
