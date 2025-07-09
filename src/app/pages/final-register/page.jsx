@@ -4,16 +4,19 @@ import Link from 'next/link';
 import Logo from '@/app/_components/caltrackLogo';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../../../utils/supabase/client';
+import { useRegister } from '@/app/_context/RegisterContext';
 
 function calcularMacros({ peso, altura, edad, genero, actividad_fisica, objetivo }) {
-    // Peso en kg, altura en cm
-    const pesoKg = Number(peso);
+    // Convertir peso de libras a kilogramos
+    const pesoKg = Number(peso) * 0.453592;
     const alturaCm = Number(altura);
     const edadNum = Number(edad);
 
+    // Normalizar género
+    const generoNorm = (genero || "").toLowerCase();
     // Fórmula de Harris-Benedict
     let tmb = 0;
-    if (genero === "Masculino") {
+    if (generoNorm === "masculino" || generoNorm === "male" || generoNorm === "hombre") {
         tmb = 88.36 + (13.4 * pesoKg) + (4.8 * alturaCm) - (5.7 * edadNum);
     } else {
         tmb = 447.6 + (9.2 * pesoKg) + (3.1 * alturaCm) - (4.3 * edadNum);
@@ -21,22 +24,22 @@ function calcularMacros({ peso, altura, edad, genero, actividad_fisica, objetivo
 
     // Factor de actividad
     let factor = 1.2;
-    if (actividad_fisica === "ligero") factor = 1.375;
+    if (actividad_fisica === "sedentario") factor = 1.2;
+    else if (actividad_fisica === "ligero") factor = 1.375;
     else if (actividad_fisica === "moderado") factor = 1.55;
     else if (actividad_fisica === "intenso") factor = 1.725;
 
     let calorias = tmb * factor;
 
     // Ajuste por objetivo
-    let objetivoMacros = { p: 0.3, c: 0.4, g: 0.3 }; // default: 30% protes, 40% carbs, 30% grasas
+    let objetivoMacros = { p: 0.3, c: 0.4, g: 0.3 }; // default
     if (objetivo && objetivo.toLowerCase().includes("perder")) {
-        calorias -= 400;
-        objetivoMacros = { p: 0.35, c: 0.35, g: 0.3 }; // más proteína, menos carbos
+        calorias -= 300;
+        objetivoMacros = { p: 0.35, c: 0.35, g: 0.3 };
     } else if (objetivo && objetivo.toLowerCase().includes("ganar")) {
-        calorias += 400;
-        objetivoMacros = { p: 0.25, c: 0.5, g: 0.25 }; // más carbos, menos grasas
+        calorias += 300;
+        objetivoMacros = { p: 0.25, c: 0.5, g: 0.25 };
     }
-
     calorias = Math.round(calorias);
 
     // Macronutrientes en gramos
@@ -53,33 +56,20 @@ function calcularMacros({ peso, altura, edad, genero, actividad_fisica, objetivo
 }
 
 const FinalRegisterPage = () => {
-    const [perfil, setPerfil] = useState(null);
+    const { registerData } = useRegister();
     const [macros, setMacros] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const router = useRouter();
 
     useEffect(() => {
-        const fetchPerfil = async () => {
-            const supabase = createClient();
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                setError("No autenticado");
-                return;
-            }
-            const { data, error } = await supabase.from("perfiles").select("*").eq("id", user.id).single();
-            if (error) {
-                setError(error.message);
-                return;
-            }
-            setPerfil(data);
-            setMacros(calcularMacros(data));
-        };
-        fetchPerfil();
-    }, []);
+        if (registerData && registerData.peso && registerData.altura && registerData.edad && registerData.genero && registerData.actividad_fisica && registerData.objetivo) {
+            setMacros(calcularMacros(registerData));
+        }
+    }, [registerData]);
 
     const handleContinue = async () => {
-        if (!perfil || !macros) return;
+        if (!macros) return;
         setLoading(true);
         setError(null);
         const supabase = createClient();
@@ -90,7 +80,7 @@ const FinalRegisterPage = () => {
             return;
         }
 
-        // Insertar metas_caloricas (upsert por si ya existe)
+        // Insertar metas_caloricas
         const { error: metaError } = await supabase.from("metas_caloricas").upsert([{
             usuario_id: user.id,
             calorias_objetivo: macros.calorias,
@@ -108,7 +98,7 @@ const FinalRegisterPage = () => {
         // Insertar peso_progreso
         const { error: pesoError } = await supabase.from("peso_progreso").insert([{
             usuario_id: user.id,
-            peso: perfil.peso,
+            peso: registerData.peso,
         }]);
 
         if (pesoError) {
@@ -118,7 +108,7 @@ const FinalRegisterPage = () => {
         }
 
         setLoading(false);
-        router.push("/pages/calories"); // Cambia la ruta si es necesario
+        router.push("/pages/calories");
     };
 
     return (
