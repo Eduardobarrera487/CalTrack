@@ -4,14 +4,30 @@ import CustomInput from "@/app/_components/input"; // Adjust the import path as 
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react"; // Or your icon library
 import CaltrackLogo from "@/app/_components/caltrackLogo"; // Adjust path if needed
+import { createClient } from "../../../../utils/supabase/client";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
+  const [message, setMessage] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle forgot password logic here (API call, etc.)
+    setError(null);
+    setMessage(null);
+    setLoading(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/pages/reset-password`
+    });
+    if (error) {
+      setError("No se pudo enviar el correo de recuperación.");
+    } else {
+      setMessage("¡Revisa tu correo para restablecer tu contraseña!");
+    }
+    setLoading(false);
   };
 
   return (
@@ -44,9 +60,12 @@ const ForgotPasswordPage = () => {
           <button
             type="submit"
             className="p-2 bg-black text-white rounded-2xl hover:bg-gray-800 transition-colors w-full"
+            disabled={loading}
           >
-            Enviar enlace de restablecimiento
+            {loading ? "Enviando..." : "Enviar enlace de restablecimiento"}
           </button>
+          {error && <div className="text-red-500 text-center">{error}</div>}
+          {message && <div className="text-green-600 text-center">{message}</div>}
         </form>
       </div>
     </div>
