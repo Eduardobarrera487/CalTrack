@@ -1,17 +1,30 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../../../utils/supabase/client';
+import { useRegister } from '@/app/_context/RegisterContext';
 
 const UserDetailsPage = () => {
-    const [gender, setGender] = useState('');
-    const [activity, setActivity] = useState('');
-    const [diets, setDiets] = useState([]);
-    const [restrictions, setRestrictions] = useState([]);
+    const { registerData, updateRegisterData } = useRegister();
+    const [gender, setGender] = useState(registerData.genero || '');
+    const [activity, setActivity] = useState(registerData.actividad_fisica || '');
+    const [diets, setDiets] = useState(registerData.preferencias || []);
+    const [restrictions, setRestrictions] = useState(registerData.restricciones || []);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+
+    // Sincroniza los cambios locales con el context
+    useEffect(() => {
+        updateRegisterData({
+            genero: gender,
+            actividad_fisica: activity,
+            preferencias: diets,
+            restricciones: restrictions,
+        });
+        // eslint-disable-next-line
+    }, [gender, activity, diets, restrictions]);
 
     const handleDietChange = (e) => {
         const { value, checked } = e.target;
