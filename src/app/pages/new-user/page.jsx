@@ -4,17 +4,19 @@ import CustomInput from '@/app/_components/input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../../../utils/supabase/client';
+import { useRegister } from '@/app/_context/RegisterContext';
 
 const NewUser = () => {
+    const { registerData, updateRegisterData } = useRegister();
     const [form, setForm] = useState({
-        nombre: "",
-        email: "",
+        nombre: registerData.nombre || "",
+        email: registerData.email || "",
         password: "",
         confirmPassword: "",
-        peso: "",
-        altura: "",
-        edad: "",
-        objetivo: "",
+        peso: registerData.peso || "",
+        altura: registerData.altura || "",
+        edad: registerData.edad || "",
+        objetivo: registerData.objetivo || "",
     });
     const [error, setError] = useState(null);
     const [emailError, setEmailError] = useState(false);
@@ -23,6 +25,7 @@ const NewUser = () => {
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
+        updateRegisterData({ [e.target.name]: e.target.value });
         if (e.target.name === "email") {
             setEmailError(false);
         }
@@ -35,11 +38,6 @@ const NewUser = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
-
-        console.log("Email entre barras: /" + form.email + "/");
-        console.log("Password entre barras: /" + form.password + "/");
-        console.log("Confirm Password entre barras: /" + form.confirmPassword + "/");
-        
 
         if (!validateEmail(form.email.trim())) {
             setEmailError(true);
@@ -106,7 +104,7 @@ const NewUser = () => {
                         onChange={handleChange}
                         required
                     />
-                    <input
+                    <CustomInput
                         type="email"
                         placeholder="Email"
                         className={`w-full ${emailError ? "border-red-500" : ""}`}
