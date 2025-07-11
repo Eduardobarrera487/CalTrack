@@ -23,17 +23,12 @@ export default function Sidebar({ open, onClose }) {
             Sobre nosotros
           </Link>
           <Link
-            href="/aiChat"
+            href="/pages/aiChat"
             className="text-lg text-gray-700 hover:text-black transition py-4 border-b border-gray-200"
           >
             IA Chat
           </Link>
-          <Link
-            href="/chat-history"
-            className="text-lg text-gray-700 hover:text-black transition py-4 border-b border-gray-200"
-          >
-            Mi historial de chat
-          </Link>
+          
         </nav>
       </div>
     </div>

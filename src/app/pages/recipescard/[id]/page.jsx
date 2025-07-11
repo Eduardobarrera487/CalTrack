@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
-import BottomNavBar from '@/app/_components/bottomNavBar'
+import BottomNavBar from '@/app/_components/BottomNavBar'
 import { Heart } from 'lucide-react'
 
 const recipes = {
