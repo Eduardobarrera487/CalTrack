@@ -1,43 +1,75 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { Search, ShoppingBasket, CloudSun } from 'lucide-react'
+import { createClient } from '../../../../utils/supabase/client'
 import BottomNavBar from '@/app/_components/BottomNavBar'
 import { useCartStore } from '../../_store/cartStore'
+import { ShoppingBasket, ArrowLeft, Search } from 'lucide-react'
 
-export default function MealBuilder() {
+export default function Lunch() {
   const router = useRouter()
+  const supabase = createClient()
+  const [itemsList, setItemsList] = useState([])
   const { items, addItem, clearCart } = useCartStore()
-
   const [selectedItem, setSelectedItem] = useState(null)
   const [showDetails, setShowDetails] = useState(false)
-  const [size, setSize] = useState('')
-  const [calories, setCalories] = useState('')
+  const [quantity, setQuantity] = useState(1)
+  const [search, setSearch] = useState('')
+
+  const [nutrients, setNutrients] = useState({
+    calorias: 0,
+    proteinas: 0,
+    carbohidratos: 0,
+    grasas: 0,
+  })
+
+  useEffect(() => {
+    supabase
+      .from('ingredientes')
+      .select('*')
+      .then(({ data, error }) => {
+        if (error) console.error('Error al cargar ingredientes:', error)
+        else setItemsList(data)
+      })
+  }, [])
 
   const handleOpenDetails = (item) => {
     setSelectedItem(item)
+    setQuantity(1)
+    setNutrients({
+      calorias: item.calorias,
+      proteinas: item.proteinas,
+      carbohidratos: item.carbohidratos,
+      grasas: item.grasas,
+    })
     setShowDetails(true)
+  }
+
+  const handleQuantityChange = (value) => {
+    const qty = parseInt(value) || 0
+    setQuantity(qty)
+    if (!selectedItem) return
+    setNutrients({
+      calorias: qty * selectedItem.calorias,
+      proteinas: qty * selectedItem.proteinas,
+      carbohidratos: qty * selectedItem.carbohidratos,
+      grasas: qty * selectedItem.grasas,
+    })
   }
 
   const handleSave = () => {
     if (!selectedItem) return
-
     const newItem = {
-      name: selectedItem.name,
-      size,
-      calories,
-      quantity: 1,
+      id: selectedItem.id,
+      name: selectedItem.nombre,
+      quantity,
+      size: quantity * 100,
+      ...nutrients,
     }
-
     addItem(newItem)
     setShowDetails(false)
-    setSize('')
-    setCalories('')
-  }
-
-  const goToCart = () => {
-    router.push('/pages/basket')
+    setQuantity(1)
   }
 
   const handleConfirm = () => {
@@ -45,33 +77,33 @@ export default function MealBuilder() {
     const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
 
     const logItems = items.map(item => ({
-      name: item.name,
-      size: item.size,
-      calories: item.calories,
-      quantity: item.quantity,
+      ...item,
       time: timeString,
-      mealType: 'almuerzo',  
+      mealType: 'almuerzo',
     }))
 
     const prevLog = JSON.parse(localStorage.getItem('mealLog') || '[]')
     localStorage.setItem('mealLog', JSON.stringify([...prevLog, ...logItems]))
-
     clearCart()
     router.push('/pages/diary')
   }
 
-  const itemList = [
-    { name: 'Huevo', img: '/huevo.jpg' },
-    { name: 'Avena', img: '/avena.jpg' },
-    { name: 'Plátano', img: '/platano.jpg' },
-    { name: 'Tomate', img: '/tomate.jpg' },
-  ]
+  const filteredItems = itemsList.filter(item =>
+    item.nombre.toLowerCase().includes(search.toLowerCase())
+  )
 
   return (
-    <div className="max-w-[430px] w-full mx-auto min-h-screen px-4 pt-6 pb-24 bg-white relative">
+    <div className="max-w-[430px] mx-auto bg-white min-h-screen p-4 font-sans">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold lowercase text-black">almuerzo</h1> 
-        <div className="relative cursor-pointer" onClick={goToCart}>
+        <button onClick={() => router.push('/pages/diary')}>
+          <ArrowLeft className="w-6 h-6 text-black" />
+        </button>
+        <h1 className="text-2xl font-bold text-gray-800 lowercase">almuerzo</h1>
+        <div
+          className="relative cursor-pointer"
+          onClick={() => router.push('/pages/basket')}
+          aria-label="Ir al carrito"
+        >
           <ShoppingBasket className="w-6 h-6 text-black" />
           <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-semibold">
             {items.reduce((total, item) => total + item.quantity, 0)}
@@ -79,49 +111,30 @@ export default function MealBuilder() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 text-gray-800 mb-4">
-        <CloudSun className="w-6 h-6 text-yellow-400" />
-        <span className="text-sm font-medium text-black">seleccionar ingredientes</span>
-      </div>
-
-      <div className="flex items-center border rounded-full px-3 py-1 mb-4">
+      <div className="flex items-center border rounded-full px-3 py-2 mb-4">
         <Search className="w-4 h-4 text-gray-500 mr-2" />
         <input
           type="text"
-          placeholder="buscar"
+          placeholder="Buscar ingredientes..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           className="flex-1 outline-none text-sm placeholder-gray-400 bg-transparent"
         />
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-4">
-        {['todos', 'vegetales', 'proteínas', 'lácteos', 'granos'].map((cat, i) => (
-          <button
-            key={i}
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
-              i === 0
-                ? 'bg-black text-white'
-                : 'bg-gray-100 text-gray-500'
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 mb-20">
-        {itemList.map((item, index) => (
-          <div
-            key={index}
-            className="bg-gray-50 rounded-xl shadow-sm p-3 flex flex-col items-center text-center"
-          >
-            <img
-              src={item.img}
-              alt={item.name}
-              className="w-20 h-20 object-contain mb-2"
-            />
-            <p className="font-medium text-sm text-gray-800">{item.name}</p>
+      <div className="grid grid-cols-2 gap-4">
+        {filteredItems.map(item => (
+          <div key={item.id} className="bg-gray-100 rounded-2xl p-3 shadow hover:shadow-md transition">
+            {item.image_url && (
+              <img
+                src={item.image_url}
+                alt={item.nombre}
+                className="w-full h-24 object-cover rounded-xl mb-2"
+              />
+            )}
+            <p className="text-center font-semibold text-gray-800">{item.nombre}</p>
             <button
-              className="mt-2 bg-black text-white text-sm px-4 py-1 rounded-md font-semibold hover:bg-gray-900"
+              className="w-full mt-2 bg-blue-800 text-white py-2 rounded-xl hover:bg-blue-900 transition"
               onClick={() => handleOpenDetails(item)}
             >
               Agregar
@@ -130,46 +143,59 @@ export default function MealBuilder() {
         ))}
       </div>
 
-      <button
-        className="absolute bottom-24 right-6 bg-black text-white font-semibold px-4 py-2 rounded-md shadow hover:bg-gray-900"
-        onClick={handleConfirm}
-      >
-        confirmar
-      </button>
+      <div className="mt-6 px-4 pb-24">
+        <button
+          onClick={handleConfirm}
+          className="w-full bg-blue-900 text-white py-3 rounded-2xl text-lg hover:bg-blue-800 transition"
+        >
+          Confirmar almuerzo
+        </button>
+      </div>
 
-      {showDetails && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-xl p-6 w-11/12 max-w-sm">
-            <h2 className="text-lg font-semibold mb-4">
-              {selectedItem?.name} - Detalles
+      {showDetails && selectedItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-sm">
+            <h2 className="text-xl font-bold text-center mb-4 text-gray-800">
+              {selectedItem.nombre} (100g por unidad)
             </h2>
 
-            <input
-              type="text"
-              placeholder="Tamaño (ej. 100g, 1 taza)"
-              className="w-full mb-2 p-2 border rounded-md text-sm"
-              value={size}
-              onChange={(e) => setSize(e.target.value)}
-            />
-            <input
-              type="number"
-              placeholder="Calorías"
-              className="w-full mb-2 p-2 border rounded-md text-sm"
-              value={calories}
-              onChange={(e) => setCalories(e.target.value)}
-            />
+            <label className="block mb-4 text-gray-700 font-medium">
+              Cantidad (x100g):
+              <input
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => handleQuantityChange(e.target.value)}
+                className="w-full border border-black text-black rounded-xl p-2 mt-1"
+              />
+            </label>
 
-            <button
-              className="w-full mt-4 bg-black text-white py-2 rounded-md font-semibold hover:bg-gray-900"
-              onClick={handleSave}
-            >
-              Guardar
-            </button>
+            <div className="grid grid-cols-2 gap-3 text-sm mb-6">
+              <div className="text-orange-500 font-semibold"><strong>Calorías:</strong> {nutrients.calorias} kcal</div>
+              <div className="text-green-600 font-semibold"><strong>Proteínas:</strong> {nutrients.proteinas} g</div>
+              <div className="text-blue-600 font-semibold"><strong>Carbohidratos:</strong> {nutrients.carbohidratos} g</div>
+              <div className="text-red-600 font-semibold"><strong>Grasas:</strong> {nutrients.grasas} g</div>
+            </div>
+
+            <div className="flex justify-between">
+              <button
+                className="px-4 py-2 bg-gray-800 text-white rounded-xl hover:bg-black"
+                onClick={() => setShowDetails(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-4 py-2 bg-blue-700 text-white rounded-xl hover:bg-blue-800"
+                onClick={handleSave}
+              >
+                Guardar
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      <BottomNavBar active='Meals' />
+      <BottomNavBar active="Meals" />
     </div>
   )
 }
