@@ -77,21 +77,46 @@ export default function MealBuilder() {
     setQuantity(1)
   }
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const now = new Date()
-    const timeString = now.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    })
+    const fecha = now.toISOString().split('T')[0] 
+    const hora = now.toTimeString().split(' ')[0] 
 
-    const logItems = items.map(item => ({
-      ...item,
-      time: timeString,
-      mealType: 'desayuno',
-    }))
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    const usuario_id = user?.id
+
+    if (userError || !usuario_id) {
+      console.error("Error obteniendo usuario:", userError?.message || userError)
+      return
+    }
+
+    const { error: insertError } = await supabase
+      .from('comidas')
+      .insert({
+        usuario_id,
+        tipo: 'desayuno',
+        fecha,
+        hora,
+      })
+
+    if (insertError) {
+      console.error("Error al insertar en comidas:", insertError)
+      return
+    }
 
     try {
+      const timeString = now.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      })
+
+      const logItems = items.map(item => ({
+        ...item,
+        time: timeString,
+        mealType: 'desayuno',
+      }))
+
       const prevLog = JSON.parse(localStorage.getItem('mealLog') || '[]')
       localStorage.setItem('mealLog', JSON.stringify([...prevLog, ...logItems]))
       clearCart()
@@ -103,7 +128,6 @@ export default function MealBuilder() {
 
   return (
     <div className="max-w-[430px] mx-auto bg-white min-h-screen p-4 font-sans">
-      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <button onClick={() => router.push('/pages/diary')}>
           <ArrowLeft className="w-6 h-6 text-black" />
@@ -121,7 +145,6 @@ export default function MealBuilder() {
         </div>
       </div>
 
-      {/* Buscador */}
       <div className="flex items-center border border-gray-300 rounded-full px-4 py-2 mb-4">
         <Search className="w-4 h-4 text-gray-500 mr-2" />
         <input
@@ -133,7 +156,6 @@ export default function MealBuilder() {
         />
       </div>
 
-      {/* Lista de ingredientes */}
       <div className="grid grid-cols-2 gap-4">
         {filteredItems.map(item => (
           <div key={item.id} className="bg-gray-100 rounded-2xl p-3 shadow hover:shadow-md transition">
@@ -155,7 +177,6 @@ export default function MealBuilder() {
         ))}
       </div>
 
-      {/* Botón confirmar */}
       <div className="mt-6 px-4 pb-24">
         <button
           onClick={handleConfirm}
@@ -165,7 +186,6 @@ export default function MealBuilder() {
         </button>
       </div>
 
-      {/* Modal detalle */}
       {showDetails && selectedItem && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-sm">

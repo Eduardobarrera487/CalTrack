@@ -1,138 +1,175 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { Plus, Clock3, Heart } from "lucide-react";
-import BottomNavBar from "@/app/_components/BottomNavBar";
+import { useEffect, useState } from 'react'
+import { createClient } from '../../../../utils/supabase/client'
 
-export default function HomeScreen() {
-  const router = useRouter();
-  const pathname = usePathname();
+export default function RecipesPage() {
+  const supabase = createClient()
 
-  const [activeCategory, setActiveCategory] = useState("");
-
-  const categories = [
-    { id: 1, label: "Entrenamiento", href: "/pages/workout" },
-    { id: 2, label: "Recetas", href: "/pages/recipes" },
-  ];
+  const [recipes, setRecipes] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showDetailsId, setShowDetailsId] = useState(null) 
 
   useEffect(() => {
-    if (pathname.startsWith("/pages/workout")) {
-      setActiveCategory("Entrenamiento");
-    } else if (pathname.startsWith("/pages/recipes")) {
-      setActiveCategory("Recetas");
-    } else {
-      setActiveCategory("");
-    }
-  }, [pathname]);
+    const fetchRecipesWithNutrition = async () => {
+      const { data, error } = await supabase
+        .from('recetas')
+        .select(`
+          id,
+          nombre,
+          fuente,
+          receta_ingredientes (
+            cantidad,
+            ingredientes (
+              calorias,
+              proteinas,
+              carbohidratos,
+              grasas,
+              nombre
+            )
+          )
+        `)
+        .order('nombre', { ascending: true })
 
-  const handleCategoryClick = (category) => {
-    setActiveCategory(category.label);
-    router.push(category.href);
-  };
+      if (error) {
+        console.error('Error al cargar recetas:', error)
+        setLoading(false)
+        return
+      }
+
+      const recipesWithTotals = data.map((receta) => {
+        let totalCalorias = 0
+        let totalProteinas = 0
+        let totalCarbohidratos = 0
+        let totalGrasas = 0
+
+        receta.receta_ingredientes.forEach(({ cantidad, ingredientes }) => {
+          if (ingredientes) {
+            totalCalorias += (ingredientes.calorias || 0) * cantidad
+            totalProteinas += (ingredientes.proteinas || 0) * cantidad
+            totalCarbohidratos += (ingredientes.carbohidratos || 0) * cantidad
+            totalGrasas += (ingredientes.grasas || 0) * cantidad
+          }
+        })
+
+        return {
+          ...receta,
+          totalCalorias: totalCalorias.toFixed(1),
+          totalProteinas: totalProteinas.toFixed(1),
+          totalCarbohidratos: totalCarbohidratos.toFixed(1),
+          totalGrasas: totalGrasas.toFixed(1),
+        }
+      })
+
+      setRecipes(recipesWithTotals)
+      setLoading(false)
+    }
+
+    fetchRecipesWithNutrition()
+  }, [supabase])
+
+  const closeDetails = () => setShowDetailsId(null)
+
+  if (loading) {
+    return (
+      <div className="max-w-[430px] mx-auto p-6 min-h-screen bg-white text-black flex justify-center items-center">
+        <p>Cargando recetas...</p>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center">
-      <div className="w-full max-w-[430px] flex flex-col overflow-hidden bg-white shadow-md rounded-lg">
-        <header className="flex items-center justify-between px-4 py-3 border-b">
-          <h1 className="text-lg font-bold text-amber-600">CalTrack</h1>
-        </header>
+    <div className="max-w-[430px] mx-auto p-6 min-h-screen bg-white text-black">
+      <h1 className="text-2xl font-bold mb-6">Recetas</h1>
 
-        <section className="flex gap-2 overflow-x-auto px-4 py-3 border-b no-scrollbar">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => handleCategoryClick(cat)}
-              className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold border transition ${
-                activeCategory === cat.label
-                  ? "bg-amber-600 text-white border-amber-600"
-                  : "bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200"
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </section>
+      {recipes.length === 0 ? (
+        <p>No hay recetas registradas.</p>
+      ) : (
+        <ul className="space-y-4">
+          {recipes.map((receta) => {
+            const preparacionLocal = localStorage.getItem(`preparacion_${receta.id}`) || 'No disponible'
 
-        {/* Botones + a la izquierda y derecha (puedes ocultarlos o dejarlos si quieres) */}
-        <button className="absolute left-2 top-[72px] bg-violet-500 hover:bg-violet-600 text-white rounded-full p-1.5 shadow-md z-10">
-          <Plus className="w-5 h-5" />
-        </button>
-        <button className="absolute right-2 top-[72px] bg-violet-500 hover:bg-violet-600 text-white rounded-full p-1.5 shadow-md z-10">
-          <Plus className="w-5 h-5" />
-        </button>
+            return (
+              <li
+                key={receta.id}
+                className="border rounded-lg p-4"
+              >
+                <h2 className="text-xl font-semibold mb-1">{receta.nombre}</h2>
+                {receta.fuente && (
+                  <p className="text-gray-600 mb-1">
+                    <strong>Fuente:</strong> {receta.fuente}
+                  </p>
+                )}
+                <p className="mb-1">
+                  <strong>Calorías:</strong> {receta.totalCalorias} kcal
+                </p>
+                <p className="mb-1">
+                  <strong>Proteínas:</strong> {receta.totalProteinas} g
+                </p>
+                <p className="mb-1">
+                  <strong>Carbohidratos:</strong> {receta.totalCarbohidratos} g
+                </p>
+                <p className="mb-1">
+                  <strong>Grasas:</strong> {receta.totalGrasas} g
+                </p>
 
-        <main className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
-          <article className="bg-white rounded-xl shadow overflow-hidden">
-            <div className="relative h-40 w-full">
-              <img
-                src="/pastaprimaveral.jpg"
-                alt="Pasta Primavera"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="p-4 space-y-2">
-              <div className="flex items-center gap-2 text-sm text-gray-700">
-                <img
-                  src="https://randomuser.me/api/portraits/women/40.jpg"
-                  alt="Chef Maria"
-                  width={24}
-                  height={24}
-                  className="rounded-full object-cover"
-                />
-                <span className="font-medium">Chef Maria</span>
-              </div>
-              <h2 className="text-lg font-semibold">Pasta Primavera</h2>
-              <p className="text-sm text-gray-600">Una deliciosa pasta con vegetales frescos</p>
+                <button
+                  className="mt-2 bg-blue-800 text-white py-2 px-4 rounded-lg hover:bg-blue-900 transition"
+                  onClick={() => setShowDetailsId(receta.id)}
+                >
+                  Ver detalles
+                </button>
 
-              <div className="flex items-center justify-between text-sm text-gray-600 pt-2">
-                <span className="flex items-center gap-1">
-                  <Clock3 className="w-4 h-4" /> 30 min
-                </span>
-                <span className="flex items-center gap-1">
-                  <Heart className="w-4 h-4" /> 128
-                </span>
-              </div>
-            </div>
-          </article>
+                {showDetailsId === receta.id && (
+                  <div
+                    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50"
+                    onClick={closeDetails}
+                  >
+                    <div
+                      className="bg-white rounded-xl max-w-lg w-full p-6 relative"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        onClick={closeDetails}
+                        className="absolute top-3 right-3 text-gray-600 hover:text-black font-bold text-xl"
+                        aria-label="Cerrar detalles"
+                      >
+                        &times;
+                      </button>
 
-          <div className="grid grid-cols-2 gap-4">
-            <article className="bg-white rounded-lg shadow overflow-hidden flex flex-col">
-              <div className="relative h-20 w-full">
-                <img
-                  src="/tacos.jpg"
-                  alt="Tacos Mexicanos"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-2 space-y-1">
-                <h3 className="text-sm font-semibold">Tacos Mexicanos</h3>
-                <div className="flex items-center text-xs text-gray-600 gap-1">
-                  <Clock3 className="w-3 h-3" /> 20 min
-                </div>
-              </div>
-            </article>
+                      <h3 className="text-2xl font-bold mb-4">{receta.nombre}</h3>
 
-            <article className="bg-white rounded-lg shadow overflow-hidden flex flex-col">
-              <div className="relative h-20 w-full">
-                <img
-                  src="/ensalada.jpg"
-                  alt="Ensalada Verde"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-2 space-y-1">
-                <h3 className="text-sm font-semibold">Ensalada Verde</h3>
-                <div className="flex items-center text-xs text-gray-600 gap-1">
-                  <Clock3 className="w-3 h-3" /> 15 min
-                </div>
-              </div>
-            </article>
-          </div>
-        </main>
+                      <p className="mb-2">
+                        <strong>Fuente:</strong> {receta.fuente || 'No disponible'}
+                      </p>
 
-        <BottomNavBar active="Workouts" />
-      </div>
+                      <h4 className="font-semibold mb-1">Ingredientes:</h4>
+                      <ul className="mb-4 list-disc list-inside max-h-40 overflow-y-auto">
+                        {receta.receta_ingredientes.length === 0 && <li>No hay ingredientes.</li>}
+                        {receta.receta_ingredientes.map(({ cantidad, ingredientes }, i) => (
+                          <li key={i}>
+                            {ingredientes?.nombre || 'Desconocido'} — {cantidad} g
+                          </li>
+                        ))}
+                      </ul>
+
+                      <h4 className="font-semibold mb-1">Preparación:</h4>
+                      <p className="whitespace-pre-wrap">{preparacionLocal}</p>
+                    </div>
+                  </div>
+                )}
+              </li>
+            )
+          })}
+        </ul>
+      )}
+
+      <button
+        onClick={() => window.location.href = '/pages/add-recipe'}
+        className="mt-6 w-full bg-blue-800 text-white py-3 rounded-lg font-semibold hover:bg-blue-900 transition"
+      >
+        Agregar Receta Nueva
+      </button>
     </div>
-  );
+  )
 }
