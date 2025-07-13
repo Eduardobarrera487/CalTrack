@@ -1,16 +1,17 @@
 "use client";
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { useState } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { useState, useMemo } from "react";
 
-const mockData = {
-  1: [{ day: "01", weight: 74 }, { day: "10", weight: 73 }, { day: "20", weight: 72.5 }],
-  2: [{ day: "01", weight: 75 }, { day: "10", weight: 73.5 }, { day: "20", weight: 72.2 }],
-  3: [{ day: "01", weight: 76 }, { day: "10", weight: 74 }, { day: "20", weight: 72 }],
-  6: [{ day: "01", weight: 78 }, { day: "15", weight: 75 }, { day: "30", weight: 72 }],
-};
-
-export default function WeightChart() {
+export default function WeightChart({ history }) {
   const [selected, setSelected] = useState(1);
 
   const buttons = [
@@ -20,9 +21,18 @@ export default function WeightChart() {
     { label: "6 meses", value: 6 },
   ];
 
+  const dataFiltered = useMemo(() => {
+    const safeHistory = Array.isArray(history) ? history : [];
+    const total = safeHistory.length;
+    const fraction = Math.ceil(total * (selected / 6));
+    return safeHistory.slice(0, fraction).map((item) => ({
+      day: new Date(item.fecha).getDate().toString().padStart(2, "0"),
+      weight: item.peso,
+    }));
+  }, [history, selected]);
+
   return (
     <div className="flex flex-col items-center w-full max-w-md gap-4">
-      {/* Selector de meses */}
       <div className="w-80 h-14 flex justify-between">
         {buttons.map((btn) => (
           <button
@@ -42,13 +52,12 @@ export default function WeightChart() {
         ))}
       </div>
 
-      {/* Gráfica */}
-      <div className="w-80 h-72 bg-white rounded-lg outline  outline-offset-[-1px] outline-gray-200 p-4">
+      <div className="w-80 h-72 bg-white rounded-lg outline outline-offset-[-1px] outline-gray-200 p-4">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={mockData[selected]}>
+          <LineChart data={dataFiltered}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="day" />
-            <YAxis domain={['auto', 'auto']} />
+            <YAxis domain={["auto", "auto"]} />
             <Tooltip />
             <Line
               type="monotone"
