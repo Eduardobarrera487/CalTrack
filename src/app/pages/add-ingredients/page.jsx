@@ -11,12 +11,11 @@ export default function AddIngredientsPage() {
   const supabase = createClient()
 
   const [ingredientesDisponibles, setIngredientesDisponibles] = useState([])
-  const [ingredientesId, setIngredientesId] = useState('')
+  const [ingredienteId, setIngredienteId] = useState('')
   const [cantidad, setCantidad] = useState('')
   const [ingredientesAgregados, setIngredientesAgregados] = useState([])
 
   useEffect(() => {
-    console.log('Receta ID:', recetaId)
     if (recetaId) {
       fetchIngredientes()
       fetchAgregados()
@@ -37,7 +36,7 @@ export default function AddIngredientsPage() {
       .from('receta_ingredientes')
       .select(`
         cantidad,
-        ingredientes_id,
+        ingrediente_id,
         ingredientes (
           nombre
         )
@@ -53,24 +52,20 @@ export default function AddIngredientsPage() {
   }
 
   const handleAgregar = async () => {
-    if (!ingredientesId || !cantidad) {
-      alert('Seleccione un ingrediente y una cantidad válida')
-      return
-    }
+    if (!ingredienteId || !cantidad) return
 
-    const { data, error } = await supabase.from('receta_ingredientes').insert([{
-      receta_id: recetaId,
-      ingredientes_id: ingredientesId,
-      cantidad: parseFloat(cantidad),
-    }])
-
-    console.log('Insert resultado:', { data, error })
+    const { error } = await supabase.from('receta_ingredientes').insert([
+      {
+        receta_id: recetaId,
+        ingrediente_id: ingredienteId,
+        cantidad: parseFloat(cantidad),
+      },
+    ])
 
     if (error) {
-      alert('Error al guardar ingrediente: ' + error.message)
       console.error('Error al guardar ingrediente:', error.message || error)
     } else {
-      setIngredientesId('')
+      setIngredienteId('')
       setCantidad('')
       fetchAgregados()
     }
@@ -81,15 +76,17 @@ export default function AddIngredientsPage() {
   }
 
   return (
-    <div className="max-w-[430px] mx-auto p-6 min-h-screen text-black bg-white">
+    <div
+      className="max-w-[430px] mx-auto p-6 min-h-screen text-black bg-white"
+    >
       <h1 className="text-2xl font-bold mb-6">Agregar Ingredientes</h1>
 
       <div className="space-y-4">
         <div>
           <label className="block font-medium mb-1">Ingrediente</label>
           <select
-            value={ingredientesId}
-            onChange={(e) => setIngredientesId(e.target.value)}
+            value={ingredienteId}
+            onChange={(e) => setIngredienteId(e.target.value)}
             className="w-full border border-gray-300 rounded-lg p-2"
           >
             <option value="">Seleccionar</option>
@@ -125,7 +122,7 @@ export default function AddIngredientsPage() {
       <ul className="space-y-2">
         {ingredientesAgregados.map((item, index) => (
           <li
-            key={`${item.ingredientes_id}-${index}`}
+            key={`${item.ingrediente_id}-${index}`}
             className="border p-3 rounded-lg bg-gray-100"
           >
             {item.ingredientes?.nombre || 'Desconocido'} — {item.cantidad} g

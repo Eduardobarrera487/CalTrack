@@ -10,7 +10,6 @@ export default function Diary() {
   const [mealLog, setMealLog] = useState([])
 
   useEffect(() => {
-    localStorage.removeItem('mealLog') // <-- Aquí eliminas el historial al recargar
     const savedLog = JSON.parse(localStorage.getItem('mealLog') || '[]')
     setMealLog(savedLog)
   }, [])
@@ -50,9 +49,20 @@ export default function Diary() {
     }
   }
 
+  const handleDeleteItem = (id) => {
+    const updatedLog = mealLog.filter(item => item.id !== id)
+    localStorage.setItem('mealLog', JSON.stringify(updatedLog))
+    setMealLog(updatedLog)
+  }
+
+  const handleClearAll = () => {
+    localStorage.removeItem('mealLog')
+    setMealLog([])
+  }
+
   return (
-    <div className="max-w-[430px] w-full mx-auto min-h-screen pb-24 bg-gradient-to-b from-gray-100 via-gray-50 to-gray-100">
-      <div className="p-6 space-y-10">
+    <div className="max-w-[430px] w-full mx-auto min-h-screen pb-28 bg-gradient-to-b from-gray-100 via-gray-50 to-gray-100 flex flex-col">
+      <div className="p-6 space-y-10 flex-grow">
         <header className="space-y-3 text-center bg-gradient-to-t from-[#7DA0CA] via-[#5483B3] to-[#052659] rounded-3xl p-8 shadow-lg text-white">
           <p className="text-lg font-light max-w-xs mx-auto drop-shadow-sm">
             Selecciona el tiempo de comida para registrar tus alimentos.
@@ -90,7 +100,7 @@ export default function Diary() {
           ))}
         </section>
 
-        <section className="space-y-8 px-2">
+        <section className="space-y-8 px-2 mt-6">
           <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
             Comidas recientes
           </h2>
@@ -99,31 +109,53 @@ export default function Diary() {
             {mealLog.length === 0 ? (
               <p className="text-center text-gray-500">No hay comidas registradas.</p>
             ) : (
-              mealLog.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center bg-white p-5 rounded-2xl shadow-xl transition hover:shadow-2xl cursor-pointer"
-                >
-                  <div className="flex items-center gap-4">
-                    {iconForMeal(item.mealType)}
-                    <div>
-                      <p className="capitalize font-bold text-gray-900 text-lg">{item.mealType}</p>
-                      <p className="text-xs text-gray-500">{item.time}</p>
+              ['desayuno', 'almuerzo', 'cena'].map((mealType) =>
+                mealLog
+                  .filter((item) => item.mealType === mealType)
+                  .map((item, index) => (
+                    <div
+                      key={item.id ?? index}
+                      className="flex justify-between items-center bg-white p-5 rounded-2xl shadow-xl transition hover:shadow-2xl cursor-pointer"
+                    >
+                      <div className="flex items-center gap-4">
+                        {iconForMeal(item.mealType)}
+                        <div>
+                          <p className="capitalize font-bold text-gray-900 text-lg">{item.name}</p>
+                          <p className="text-xs text-gray-500">{item.size} • {item.calorias ?? item.calories} kcal</p>
+                          <p className="text-xs text-gray-500">{item.time}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Settings
+                          className="text-gray-400 w-6 h-6 cursor-pointer hover:text-gray-600 transition"
+                          onClick={() => handleEditMeal(index, item.mealType)}
+                        />
+                        <button
+                          onClick={() => handleDeleteItem(item.id)}
+                          className="text-red-500 hover:text-red-700"
+                          aria-label="Eliminar comida"
+                        >
+                          &#x2716;
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="font-semibold text-gray-900">
-                    {item.calories ? `${item.calories} kcal` : '0 kcal'}
-                  </div>
-                  <Settings
-                    className="text-gray-400 w-6 h-6 cursor-pointer hover:text-gray-600 transition"
-                    onClick={() => handleEditMeal(index, item.mealType)}
-                  />
-                </div>
-              ))
+                  ))
+              )
             )}
           </div>
         </section>
       </div>
+
+      {mealLog.length > 0 && (
+        <div className="px-6 pb-4">
+          <button
+            onClick={handleClearAll}
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-2xl shadow-md transition"
+          >
+            Borrar todo el historial
+          </button>
+        </div>
+      )}
 
       <BottomNavBar />
     </div>
