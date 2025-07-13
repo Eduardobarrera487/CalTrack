@@ -7,6 +7,9 @@ export default function CaloriesCard({ data }) {
 
   const {
     meta_calorias = 2000,
+    meta_proteinas = 0,
+    meta_carbohidratos = 0,
+    meta_grasas = 0,
     consumidas = 0,
     proteinas = 0,
     carbohidratos = 0,
@@ -37,21 +40,27 @@ export default function CaloriesCard({ data }) {
         </div>
       </div>
 
-      <div className="flex justify-between text-center text-sm">
-        <div>
-          <div className="w-3 h-3 mx-auto mb-1 rounded-full bg-blue-900" />
+      <div className="flex justify-between text-center text-sm space-x-6">
+        <div className="flex flex-col items-center">
+          <div className="w-3 h-3 mb-1 rounded-full bg-blue-900" />
           <div className="font-medium text-gray-900">{proteinas}g</div>
-          <div className="text-gray-500 text-xs">Protein</div>
+          <div className="text-gray-500 text-xs">
+            Protein / {meta_proteinas}g
+          </div>
         </div>
-        <div>
-          <div className="w-3 h-3 mx-auto mb-1 rounded-full bg-emerald-500" />
+        <div className="flex flex-col items-center">
+          <div className="w-3 h-3 mb-1 rounded-full bg-emerald-500" />
           <div className="font-medium text-gray-900">{carbohidratos}g</div>
-          <div className="text-gray-500 text-xs">Carbs</div>
+          <div className="text-gray-500 text-xs">
+            Carbs / {meta_carbohidratos}g
+          </div>
         </div>
-        <div>
-          <div className="w-3 h-3 mx-auto mb-1 rounded-full bg-orange-500" />
+        <div className="flex flex-col items-center">
+          <div className="w-3 h-3 mb-1 rounded-full bg-orange-500" />
           <div className="font-medium text-gray-900">{grasas}g</div>
-          <div className="text-gray-500 text-xs">Fats</div>
+          <div className="text-gray-500 text-xs">
+            Fats / {meta_grasas}g
+          </div>
         </div>
       </div>
     </div>

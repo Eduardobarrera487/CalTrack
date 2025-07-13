@@ -74,44 +74,75 @@ export default function Lunch() {
 
   const handleConfirm = async () => {
     const now = new Date()
-    const timeString = now.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    })
+    const fecha = now.toISOString().split('T')[0]
+    const hora = now.toTimeString().split(' ')[0]
 
-    const logItems = items.map((item) => ({
-      ...item,
-      time: timeString,
-      mealType: 'almuerzo',
-    }))
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    const usuario_id = user?.id
 
-    const prevLog = JSON.parse(localStorage.getItem('mealLog') || '[]')
-    localStorage.setItem('mealLog', JSON.stringify([...prevLog, ...logItems]))
-
-    try {
-      const { data: { user }, error: userError } = await supabase.auth.getUser()
-      const usuario_id = user?.id
-
-      if (!usuario_id || userError) {
-        console.error('No se pudo obtener el usuario:', userError)
-      } else {
-        await supabase.from('comidas').insert({
-          usuario_id,
-          tipo: 'almuerzo',
-          fecha: now.toISOString().split('T')[0],
-          hora: timeString,
-        })
-      }
-    } catch (error) {
-      console.error('Error al guardar almuerzo en Supabase:', error)
+    if (userError || !usuario_id) {
+      console.error("Error obteniendo usuario:", userError?.message || userError)
+      return
     }
 
-    clearCart()
-    router.push('/pages/diary')
+    // Insertar registro en comidas y obtener el id generado
+    const { data: comidaData, error: insertError } = await supabase
+      .from('comidas')
+      .insert({
+        usuario_id,
+        tipo: 'almuerzo',
+        fecha,
+        hora,
+      })
+      .select('id')
+      .single()
+
+    if (insertError) {
+      console.error("Error al insertar en comidas:", insertError)
+      return
+    }
+
+    const comidaId = comidaData.id
+
+    // Insertar ingredientes en comida_ingredientes
+    const ingredientesToInsert = items.map(item => ({
+      comida_id: comidaId,
+      ingredientes_id: item.id,
+      cantidad: item.quantity * 100,
+    }))
+
+    const { error: insertIngredientesError } = await supabase
+      .from('comida_ingredientes')
+      .insert(ingredientesToInsert)
+
+    if (insertIngredientesError) {
+      console.error('Error insertando en comida_ingredientes:', insertIngredientesError)
+      return
+    }
+
+    try {
+      const timeString = now.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      })
+
+      const logItems = items.map(item => ({
+        ...item,
+        time: timeString,
+        mealType: 'almuerzo',
+      }))
+
+      const prevLog = JSON.parse(localStorage.getItem('mealLog') || '[]')
+      localStorage.setItem('mealLog', JSON.stringify([...prevLog, ...logItems]))
+      clearCart()
+      router.push('/pages/diary')
+    } catch (error) {
+      console.error("Error al guardar almuerzo:", error)
+    }
   }
 
-  const filteredItems = itemsList.filter((item) =>
+  const filteredItems = itemsList.filter(item =>
     item.nombre.toLowerCase().includes(search.toLowerCase())
   )
 
@@ -146,7 +177,7 @@ export default function Lunch() {
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        {filteredItems.map((item) => (
+        {filteredItems.map(item => (
           <div key={item.id} className="bg-gray-100 rounded-2xl p-3 shadow hover:shadow-md transition">
             {item.image_url && (
               <img

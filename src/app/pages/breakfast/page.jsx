@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -79,8 +79,8 @@ export default function MealBuilder() {
 
   const handleConfirm = async () => {
     const now = new Date()
-    const fecha = now.toISOString().split('T')[0] 
-    const hora = now.toTimeString().split(' ')[0] 
+    const fecha = now.toISOString().split('T')[0]
+    const hora = now.toTimeString().split(' ')[0]
 
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     const usuario_id = user?.id
@@ -90,7 +90,7 @@ export default function MealBuilder() {
       return
     }
 
-    const { error: insertError } = await supabase
+    const { data: comidaData, error: insertError } = await supabase
       .from('comidas')
       .insert({
         usuario_id,
@@ -98,9 +98,28 @@ export default function MealBuilder() {
         fecha,
         hora,
       })
+      .select('id')
+      .single()
 
     if (insertError) {
       console.error("Error al insertar en comidas:", insertError)
+      return
+    }
+
+    const comidaId = comidaData.id
+
+    const ingredientesToInsert = items.map(item => ({
+      comida_id: comidaId,
+      ingrediente_id: item.id,
+      cantidad: item.quantity * 100,
+    }))
+
+    const { error: insertIngredientesError } = await supabase
+      .from('comida_ingredientes')
+      .insert(ingredientesToInsert)
+
+    if (insertIngredientesError) {
+      console.error('Error insertando en comida_ingredientes:', insertIngredientesError)
       return
     }
 
