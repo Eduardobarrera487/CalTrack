@@ -46,7 +46,6 @@ export default function AddIngredientsPage() {
     if (error) {
       console.error('Error al cargar ingredientes agregados:', error.message || error)
     } else {
-      console.log('Ingredientes agregados:', data)
       setIngredientesAgregados(data || [])
     }
   }
@@ -76,9 +75,14 @@ export default function AddIngredientsPage() {
   }
 
   return (
-    <div
-      className="max-w-[430px] mx-auto p-6 min-h-screen text-black bg-white"
-    >
+    <div className="max-w-[430px] mx-auto p-6 min-h-screen text-black bg-white">
+      <button
+        onClick={() => router.push('/pages/add-recipe')}
+        className="mb-4 text-blue-700 hover:text-blue-900 font-semibold"
+      >
+        ← Volver
+      </button>
+
       <h1 className="text-2xl font-bold mb-6">Agregar Ingredientes</h1>
 
       <div className="space-y-4">

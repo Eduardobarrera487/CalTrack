@@ -2,62 +2,123 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Sun, Moon, CloudSun, Settings } from 'lucide-react'
+import { createClient } from '../../../../utils/supabase/client'
+import { Sun, Moon, CloudSun, Settings, Trash2 } from 'lucide-react'
 import BottomNavBar from '@/app/_components/BottomNavBar'
 
 export default function Diary() {
   const router = useRouter()
+  const supabase = createClient()
   const [mealLog, setMealLog] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false)
+  const [mealToDelete, setMealToDelete] = useState(null)
 
   useEffect(() => {
-    const savedLog = JSON.parse(localStorage.getItem('mealLog') || '[]')
-    setMealLog(savedLog)
+    fetchMeals()
   }, [])
+
+  const fetchMeals = async () => {
+    const { data: sessionData, error: sessionError } = await supabase.auth.getUser()
+    const usuario_id = sessionData?.user?.id
+
+    if (sessionError || !usuario_id) {
+      console.error("Error obteniendo sesión del usuario:", sessionError)
+      setLoading(false)
+      return
+    }
+
+    const { data, error } = await supabase
+      .from('comidas')
+      .select(`
+        id,
+        tipo,
+        fecha,
+        hora,
+        comida_ingredientes (
+          cantidad,
+          ingrediente_id (
+            nombre,
+            calorias,
+            proteinas,
+            carbohidratos,
+            grasas
+          )
+        )
+      `)
+      .eq('usuario_id', usuario_id)
+      .order('fecha', { ascending: false })
+      .order('hora', { ascending: false })
+
+    if (error) {
+      console.error('Error al obtener comidas:', error)
+      setLoading(false)
+      return
+    }
+
+    const parsed = data.map(comida => ({
+      id: comida.id,
+      tipo: comida.tipo,
+      fecha: comida.fecha,
+      hora: comida.hora,
+      items: comida.comida_ingredientes.map(ci => ({
+        nombre: ci.ingrediente_id.nombre,
+        calorias: ci.ingrediente_id.calorias * (ci.cantidad / 100),
+        proteinas: ci.ingrediente_id.proteinas * (ci.cantidad / 100),
+        carbohidratos: ci.ingrediente_id.carbohidratos * (ci.cantidad / 100),
+        grasas: ci.ingrediente_id.grasas * (ci.cantidad / 100),
+        cantidad: ci.cantidad,
+      }))
+    }))
+
+    setMealLog(parsed)
+    setLoading(false)
+  }
 
   const iconForMeal = (mealType) => {
     switch (mealType) {
-      case 'desayuno':
-        return <CloudSun className="text-yellow-500 w-7 h-7 drop-shadow" />
-      case 'almuerzo':
-        return <Sun className="text-yellow-600 w-7 h-7 drop-shadow" />
-      case 'cena':
-        return <Moon className="text-gray-700 w-7 h-7 drop-shadow" />
-      default:
-        return null
+      case 'desayuno': return <CloudSun className="text-yellow-500 w-7 h-7 drop-shadow" />
+      case 'almuerzo': return <Sun className="text-yellow-600 w-7 h-7 drop-shadow" />
+      case 'cena': return <Moon className="text-gray-700 w-7 h-7 drop-shadow" />
+      default: return null
     }
   }
 
   const handleAddMeal = (mealLabel) => {
-    const routesMap = {
+    const path = {
       'Desayuno': '/pages/breakfast',
       'Almuerzo': '/pages/lunch',
       'Cena': '/pages/dinner',
-    }
-    const path = routesMap[mealLabel]
+    }[mealLabel]
     if (path) router.push(path)
   }
 
-  const handleEditMeal = (index, mealType) => {
-    const routesMap = {
-      desayuno: '/pages/breakfast',
-      almuerzo: '/pages/lunch',
-      cena: '/pages/dinner',
-    }
-    const path = routesMap[mealType]
-    if (path) {
-      router.push(`${path}?editIndex=${index}`)
-    }
+  const confirmDeleteMeal = (mealId) => {
+    setMealToDelete(mealId)
+    setShowConfirmDelete(true)
   }
 
-  const handleDeleteItem = (id) => {
-    const updatedLog = mealLog.filter(item => item.id !== id)
-    localStorage.setItem('mealLog', JSON.stringify(updatedLog))
-    setMealLog(updatedLog)
-  }
+  const handleDeleteMeal = async () => {
+    if (!mealToDelete) return
 
-  const handleClearAll = () => {
-    localStorage.removeItem('mealLog')
-    setMealLog([])
+    const { error: deleteIngredientsError } = await supabase
+      .from('comida_ingredientes')
+      .delete()
+      .eq('comida_id', mealToDelete)
+
+    const { error: deleteComidaError } = await supabase
+      .from('comidas')
+      .delete()
+      .eq('id', mealToDelete)
+
+    if (deleteIngredientsError || deleteComidaError) {
+      console.error("Error eliminando comida:", deleteIngredientsError || deleteComidaError)
+      return
+    }
+
+    setShowConfirmDelete(false)
+    setMealToDelete(null)
+    fetchMeals()
   }
 
   return (
@@ -70,29 +131,13 @@ export default function Diary() {
         </header>
 
         <section className="grid grid-cols-3 gap-6 px-2">
-          {[
-            {
-              label: 'Desayuno',
-              icon: <CloudSun className="mx-auto h-8 w-8 text-yellow-400 drop-shadow" />,
-            },
-            {
-              label: 'Almuerzo',
-              icon: <Sun className="mx-auto h-8 w-8 text-yellow-600 drop-shadow" />,
-            },
-            {
-              label: 'Cena',
-              icon: <Moon className="mx-auto h-8 w-8 text-gray-700 drop-shadow" />,
-            },
-          ].map((meal) => (
-            <div
-              key={meal.label}
-              className="bg-white rounded-2xl shadow-lg p-4 flex flex-col items-center text-center cursor-pointer transition transform hover:-translate-y-0.5 hover:shadow-xl active:scale-95"
-            >
-              {meal.icon}
-              <h3 className="mt-3 text-base font-semibold text-gray-900">{meal.label}</h3>
+          {['Desayuno', 'Almuerzo', 'Cena'].map(label => (
+            <div key={label} className="bg-white rounded-2xl shadow-lg p-4 flex flex-col items-center text-center cursor-pointer hover:shadow-xl active:scale-95">
+              {iconForMeal(label.toLowerCase())}
+              <h3 className="mt-3 text-base font-semibold text-gray-900">{label}</h3>
               <button
                 className="mt-4 bg-black text-white text-xs font-semibold px-5 py-1.5 rounded-full shadow-md hover:bg-gray-900 active:scale-95 transition"
-                onClick={() => handleAddMeal(meal.label)}
+                onClick={() => handleAddMeal(label)}
               >
                 Agregar
               </button>
@@ -105,55 +150,57 @@ export default function Diary() {
             Comidas recientes
           </h2>
 
-          <div className="space-y-5">
-            {mealLog.length === 0 ? (
-              <p className="text-center text-gray-500">No hay comidas registradas.</p>
-            ) : (
-              ['desayuno', 'almuerzo', 'cena'].map((mealType) =>
-                mealLog
-                  .filter((item) => item.mealType === mealType)
-                  .map((item, index) => (
-                    <div
-                      key={item.id ?? index}
-                      className="flex justify-between items-center bg-white p-5 rounded-2xl shadow-xl transition hover:shadow-2xl cursor-pointer"
-                    >
+          {loading ? <p className="text-center text-gray-500">Cargando...</p> : (
+            <div className="space-y-5">
+              {mealLog.length === 0 ? (
+                <p className="text-center text-gray-500">No hay comidas registradas.</p>
+              ) : (
+                mealLog.map(meal => (
+                  <div
+                    key={meal.id}
+                    className="bg-white p-5 rounded-2xl shadow-xl hover:shadow-2xl"
+                  >
+                    <div className="flex justify-between items-center">
                       <div className="flex items-center gap-4">
-                        {iconForMeal(item.mealType)}
+                        {iconForMeal(meal.tipo)}
                         <div>
-                          <p className="capitalize font-bold text-gray-900 text-lg">{item.name}</p>
-                          <p className="text-xs text-gray-500">{item.size} • {item.calorias ?? item.calories} kcal</p>
-                          <p className="text-xs text-gray-500">{item.time}</p>
+                          <p className="capitalize font-bold text-gray-900 text-lg">{meal.tipo}</p>
+                          <p className="text-xs text-gray-500">{meal.fecha} {meal.hora}</p>
+                          <p className="text-xs text-gray-500">{meal.items.length} ingrediente(s)</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Settings
-                          className="text-gray-400 w-6 h-6 cursor-pointer hover:text-gray-600 transition"
-                          onClick={() => handleEditMeal(index, item.mealType)}
-                        />
-                        <button
-                          onClick={() => handleDeleteItem(item.id)}
-                          className="text-red-500 hover:text-red-700"
-                          aria-label="Eliminar comida"
-                        >
-                          &#x2716;
-                        </button>
-                      </div>
+                      <button
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => confirmDeleteMeal(meal.id)}
+                        aria-label="Eliminar comida"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
                     </div>
-                  ))
-              )
-            )}
-          </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
         </section>
       </div>
 
-      {mealLog.length > 0 && (
-        <div className="px-6 pb-4">
-          <button
-            onClick={handleClearAll}
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-2xl shadow-md transition"
-          >
-            Borrar todo el historial
-          </button>
+      {showConfirmDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">¿Eliminar esta comida?</h2>
+            <p className="text-sm text-gray-700 mb-6">Esta acción no se puede deshacer.</p>
+            <div className="flex justify-end gap-3">
+              <button
+                className="px-4 py-2 rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300"
+                onClick={() => setShowConfirmDelete(false)}
+              >Cancelar</button>
+              <button
+                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
+                onClick={handleDeleteMeal}
+              >Eliminar</button>
+            </div>
+          </div>
         </div>
       )}
 
