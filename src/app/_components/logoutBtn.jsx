@@ -29,7 +29,7 @@ export default function LogoutBtn() {
   return (
     <button
       onClick={handleLogout}
-      className="w-full py-3 mt-4 bg-red-500 text-white rounded-xl font-semibold text-base shadow-md active:bg-red-700 transition-colors"
+      className="w-full py-3 mt-4 bg-red-500 text-white rounded-xl font-semibold text-base shadow-md active:bg-red-700 transition-colors "
       style={{
         letterSpacing: "0.02em",
         boxShadow: "0 2px 8px rgba(220,38,38,0.08)",

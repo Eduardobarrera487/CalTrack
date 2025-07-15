@@ -5,6 +5,7 @@ import Sidebar from "@/app/_components/Sidebar";
 import CustomButton from "@/app/_components/button";
 import CustomInput from "@/app/_components/input";
 import BottomNavBar from "@/app/_components/BottomNavBar";
+import LogoutBtn from "@/app/_components/logoutBtn";
 
 export default function UserConfig() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -83,8 +84,14 @@ export default function UserConfig() {
             </CustomButton>
           </form>
         </section>
+        <section className="pb-12">
+          <LogoutBtn/>
+        </section>
+
+
       </main>
         <BottomNavBar active="Profile"/>
+
     </div>
   );
 }
