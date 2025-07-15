@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '../../../../utils/supabase/client'
+import BottomNavBar from '@/app/_components/BottomNavBar'
 
 export default function RecipesPage() {
   const supabase = createClient()
@@ -79,7 +80,7 @@ export default function RecipesPage() {
   }
 
   return (
-    <div className="max-w-[430px] mx-auto p-6 min-h-screen bg-white text-black">
+    <div className="max-w-[430px] mx-auto p-6 min-h-screen bg-white text-black pl-2 pr-2">
       <h1 className="text-2xl font-bold mb-6">Recetas</h1>
 
       {recipes.length === 0 ? (
@@ -166,10 +167,12 @@ export default function RecipesPage() {
 
       <button
         onClick={() => window.location.href = '/pages/add-recipe'}
-        className="mt-6 w-full bg-blue-800 text-white py-3 rounded-lg font-semibold hover:bg-blue-900 transition"
+        className="mb-10 mt-6 w-full bg-blue-800 text-white py-3 rounded-lg font-semibold hover:bg-blue-900 transition"
       >
         Agregar Receta Nueva
       </button>
+      <BottomNavBar active="Workouts" />
+
     </div>
   )
 }
