@@ -9,7 +9,6 @@ export default function AddRecipePage() {
   const supabase = createClient()
 
   const [nombre, setNombre] = useState('')
-  const [fuente, setFuente] = useState('')
   const [tiempo, setTiempo] = useState('')
   const [porciones, setPorciones] = useState('')
   const [calificacion, setCalificacion] = useState('')
@@ -22,6 +21,29 @@ export default function AddRecipePage() {
       alert('El nombre es obligatorio')
       return
     }
+
+    const { data: userData, error: userError } = await supabase.auth.getUser()
+    const usuario_id = userData?.user?.id
+
+    if (userError || !usuario_id) {
+      alert('Error con la sesión del usuario')
+      console.error(userError)
+      return
+    }
+
+    const { data: perfil, error: perfilError } = await supabase
+      .from('perfiles')
+      .select('nombre')
+      .eq('id', usuario_id)
+      .single()
+
+    if (perfilError || !perfil?.nombre) {
+      alert('No se pudo obtener el nombre del usuario')
+      console.error(perfilError)
+      return
+    }
+
+    const fuente = perfil.nombre
 
     const { data, error } = await supabase
       .from('recetas')
@@ -42,6 +64,13 @@ export default function AddRecipePage() {
 
   return (
     <div className="max-w-[430px] mx-auto p-6 min-h-screen bg-white text-black">
+      <button
+        onClick={() => router.push('/pages/recipes')}
+        className="mb-4 text-blue-700 hover:text-blue-900 font-semibold"
+      >
+        ← Volver
+      </button>
+
       <h1 className="text-2xl font-bold mb-6">Agregar Receta</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -52,17 +81,6 @@ export default function AddRecipePage() {
             onChange={(e) => setNombre(e.target.value)}
             className="w-full border rounded p-2 text-black"
             required
-          />
-        </div>
-
-        <div>
-          <label className="block font-medium mb-1">Fuente</label>
-          <input
-            type="text"
-            value={fuente}
-            onChange={(e) => setFuente(e.target.value)}
-            className="w-full border rounded p-2 text-black"
-            placeholder="Ej: Libro, Página web, etc."
           />
         </div>
 

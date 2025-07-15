@@ -17,9 +17,20 @@ export default function ActivityDashboard() {
 
   const fetchExercises = async () => {
     setLoading(true)
+
+    const { data: sessionData, error: sessionError } = await supabase.auth.getUser()
+    const usuario_id = sessionData?.user?.id
+
+    if (sessionError || !usuario_id) {
+      console.error("Error obteniendo sesión del usuario:", sessionError)
+      setLoading(false)
+      return
+    }
+
     const { data, error } = await supabase
       .from('entrenamientos')
       .select('*')
+      .eq('usuario_id', usuario_id)
       .order('id', { ascending: false })
 
     if (error) {
@@ -55,16 +66,13 @@ export default function ActivityDashboard() {
     }
   }
 
-  // Suma total de calorías quemadas
   const totalCalories = history.reduce(
     (sum, item) => sum + (item.calorias_quemadas || 0),
     0
   )
 
-  // Porcentaje para barra (máx 100%)
   const progressPercent = Math.min((totalCalories / CALORIE_GOAL) * 100, 100)
 
-  // Función que devuelve color según porcentaje
   const progressColor = () => {
     if (progressPercent < 40) return 'bg-red-500'
     if (progressPercent < 80) return 'bg-yellow-400'

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -7,7 +7,7 @@ import BottomNavBar from '@/app/_components/BottomNavBar'
 import { useCartStore } from '../../_store/cartStore'
 import { ShoppingBasket, ArrowLeft, Search } from 'lucide-react'
 
-export default function MealBuilder() {
+export default function Breakfast() {
   const router = useRouter()
   const supabase = createClient()
   const [itemsList, setItemsList] = useState([])
@@ -123,26 +123,8 @@ export default function MealBuilder() {
       return
     }
 
-    try {
-      const timeString = now.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      })
-
-      const logItems = items.map(item => ({
-        ...item,
-        time: timeString,
-        mealType: 'desayuno',
-      }))
-
-      const prevLog = JSON.parse(localStorage.getItem('mealLog') || '[]')
-      localStorage.setItem('mealLog', JSON.stringify([...prevLog, ...logItems]))
-      clearCart()
-      router.push('/pages/diary')
-    } catch (error) {
-      console.error("Error al guardar desayuno:", error)
-    }
+    clearCart()
+    router.push('/pages/diary')
   }
 
   return (
@@ -155,7 +137,6 @@ export default function MealBuilder() {
         <div
           className="relative cursor-pointer"
           onClick={() => router.push('/pages/basket')}
-          aria-label="Ir al carrito"
         >
           <ShoppingBasket className="w-6 h-6 text-black" />
           <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-semibold">

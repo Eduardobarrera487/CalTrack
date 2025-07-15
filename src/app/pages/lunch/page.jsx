@@ -1,146 +1,235 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '../../../../utils/supabase/client'
+import BottomNavBar from '@/app/_components/BottomNavBar'
+import { useCartStore } from '../../_store/cartStore'
+import { ShoppingBasket, ArrowLeft, Search } from 'lucide-react'
 
-export default function AddIngredientsPage() {
-  const searchParams = useSearchParams()
-  const recetaId = searchParams.get('recetaId')
+export default function Lunch() {
   const router = useRouter()
   const supabase = createClient()
+  const [itemsList, setItemsList] = useState([])
+  const { items, addItem, clearCart } = useCartStore()
 
-  const [ingredientesDisponibles, setIngredientesDisponibles] = useState([])
-  const [ingredientesId, setIngredientesId] = useState('')
-  const [cantidad, setCantidad] = useState('')
-  const [ingredientesAgregados, setIngredientesAgregados] = useState([])
+  const [selectedItem, setSelectedItem] = useState(null)
+  const [showDetails, setShowDetails] = useState(false)
+  const [quantity, setQuantity] = useState(1)
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const [nutrients, setNutrients] = useState({
+    calorias: 0,
+    proteinas: 0,
+    carbohidratos: 0,
+    grasas: 0,
+  })
 
   useEffect(() => {
-    console.log('Receta ID:', recetaId)
-    if (recetaId) {
-      fetchIngredientes()
-      fetchAgregados()
-    }
-  }, [recetaId])
+    supabase
+      .from('ingredientes')
+      .select('*')
+      .then(({ data, error }) => {
+        if (error) console.error('Error al cargar ingredientes:', error)
+        else setItemsList(data)
+      })
+  }, [])
 
-  const fetchIngredientes = async () => {
-    const { data, error } = await supabase.from('ingredientes').select('*')
-    if (error) {
-      console.error('Error al cargar ingredientes:', error)
-    } else {
-      setIngredientesDisponibles(data || [])
-    }
+  const filteredItems = itemsList.filter(item =>
+    item.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  const handleOpenDetails = (item) => {
+    setSelectedItem(item)
+    setQuantity(1)
+    setNutrients({
+      calorias: item.calorias,
+      proteinas: item.proteinas,
+      carbohidratos: item.carbohidratos,
+      grasas: item.grasas,
+    })
+    setShowDetails(true)
   }
 
-  const fetchAgregados = async () => {
-    const { data, error } = await supabase
-      .from('receta_ingredientes')
-      .select(`
-        cantidad,
-        ingredientes_id,
-        ingredientes (
-          nombre
-        )
-      `)
-      .eq('receta_id', recetaId)
-
-    if (error) {
-      console.error('Error al cargar ingredientes agregados:', error.message || error)
-    } else {
-      console.log('Ingredientes agregados:', data)
-      setIngredientesAgregados(data || [])
-    }
+  const handleQuantityChange = (value) => {
+    const qty = parseInt(value) || 0
+    setQuantity(qty)
+    if (!selectedItem) return
+    setNutrients({
+      calorias: qty * selectedItem.calorias,
+      proteinas: qty * selectedItem.proteinas,
+      carbohidratos: qty * selectedItem.carbohidratos,
+      grasas: qty * selectedItem.grasas,
+    })
   }
 
-  const handleAgregar = async () => {
-    if (!ingredientesId || !cantidad) {
-      alert('Seleccione un ingrediente y una cantidad válida')
+  const handleSave = () => {
+    if (!selectedItem) return
+    const newItem = {
+      id: selectedItem.id,
+      name: selectedItem.nombre,
+      quantity,
+      size: quantity * 100,
+      ...nutrients,
+    }
+    addItem(newItem)
+    setShowDetails(false)
+    setQuantity(1)
+  }
+
+  const handleConfirm = async () => {
+    const now = new Date()
+    const fecha = now.toISOString().split('T')[0]
+    const hora = now.toTimeString().split(' ')[0]
+
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    const usuario_id = user?.id
+
+    if (userError || !usuario_id) {
+      console.error("Error obteniendo usuario:", userError?.message || userError)
       return
     }
 
-    const { data, error } = await supabase.from('receta_ingredientes').insert([{
-      receta_id: recetaId,
-      ingredientes_id: ingredientesId,
-      cantidad: parseFloat(cantidad),
-    }])
+    const { data: comidaData, error: insertError } = await supabase
+      .from('comidas')
+      .insert({
+        usuario_id,
+        tipo: 'almuerzo',
+        fecha,
+        hora,
+      })
+      .select('id')
+      .single()
 
-    console.log('Insert resultado:', { data, error })
-
-    if (error) {
-      alert('Error al guardar ingrediente: ' + error.message)
-      console.error('Error al guardar ingrediente:', error.message || error)
-    } else {
-      setIngredientesId('')
-      setCantidad('')
-      fetchAgregados()
+    if (insertError) {
+      console.error("Error al insertar en comidas:", insertError)
+      return
     }
-  }
 
-  const handleConfirmar = () => {
-    router.push('/pages/recipes')
+    const comidaId = comidaData.id
+
+    const ingredientesToInsert = items.map(item => ({
+      comida_id: comidaId,
+      ingrediente_id: item.id,
+      cantidad: item.quantity * 100,
+    }))
+
+    const { error: insertIngredientesError } = await supabase
+      .from('comida_ingredientes')
+      .insert(ingredientesToInsert)
+
+    if (insertIngredientesError) {
+      console.error('Error insertando en comida_ingredientes:', insertIngredientesError)
+      return
+    }
+
+    clearCart()
+    router.push('/pages/diary')
   }
 
   return (
-    <div className="max-w-[430px] mx-auto p-6 min-h-screen text-black bg-white">
-      <h1 className="text-2xl font-bold mb-6">Agregar Ingredientes</h1>
-
-      <div className="space-y-4">
-        <div>
-          <label className="block font-medium mb-1">Ingrediente</label>
-          <select
-            value={ingredientesId}
-            onChange={(e) => setIngredientesId(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-2"
-          >
-            <option value="">Seleccionar</option>
-            {ingredientesDisponibles.map((ing) => (
-              <option key={ing.id} value={ing.id}>
-                {ing.nombre}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block font-medium mb-1">Cantidad (g)</label>
-          <input
-            type="number"
-            value={cantidad}
-            onChange={(e) => setCantidad(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-2"
-            placeholder="Ej. 100"
-            min={1}
-          />
-        </div>
-
-        <button
-          onClick={handleAgregar}
-          className="w-full bg-blue-800 text-white py-3 rounded-lg font-semibold hover:bg-blue-900 transition"
-        >
-          Agregar Ingrediente
+    <div className="max-w-[430px] mx-auto bg-white min-h-screen p-4 font-sans">
+      <div className="flex items-center justify-between mb-4">
+        <button onClick={() => router.push('/pages/diary')}>
+          <ArrowLeft className="w-6 h-6 text-black" />
         </button>
+        <h1 className="text-xl font-bold text-gray-800 lowercase">almuerzo</h1>
+        <div
+          className="relative cursor-pointer"
+          onClick={() => router.push('/pages/basket')}
+        >
+          <ShoppingBasket className="w-6 h-6 text-black" />
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-semibold">
+            {items.reduce((total, item) => total + item.quantity, 0)}
+          </span>
+        </div>
       </div>
 
-      <h2 className="text-lg font-bold mt-8 mb-3">Ingredientes agregados</h2>
-      <ul className="space-y-2">
-        {ingredientesAgregados.map((item, index) => (
-          <li
-            key={`${item.ingredientes_id}-${index}`}
-            className="border p-3 rounded-lg bg-gray-100"
-          >
-            {item.ingredientes?.nombre || 'Desconocido'} — {item.cantidad} g
-          </li>
+      <div className="flex items-center border border-gray-300 rounded-full px-4 py-2 mb-4">
+        <Search className="w-4 h-4 text-gray-500 mr-2" />
+        <input
+          type="text"
+          placeholder="Buscar ingrediente"
+          className="flex-1 text-sm text-black placeholder-gray-400 bg-transparent outline-none"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        {filteredItems.map(item => (
+          <div key={item.id} className="bg-gray-100 rounded-2xl p-3 shadow hover:shadow-md transition">
+            {item.image_url && (
+              <img
+                src={item.image_url}
+                alt={item.nombre}
+                className="w-full h-24 object-cover rounded-xl mb-2"
+              />
+            )}
+            <p className="text-center font-semibold text-gray-800">{item.nombre}</p>
+            <button
+              className="w-full mt-2 bg-blue-800 text-white py-2 rounded-xl hover:bg-blue-900 transition"
+              onClick={() => handleOpenDetails(item)}
+            >
+              Agregar
+            </button>
+          </div>
         ))}
-      </ul>
+      </div>
 
-      <div className="mt-8">
+      <div className="mt-6 px-4 pb-24">
         <button
-          onClick={handleConfirmar}
-          className="w-full bg-green-700 text-white py-3 rounded-lg font-semibold hover:bg-green-800 transition"
+          onClick={handleConfirm}
+          className="w-full bg-blue-900 text-white py-3 rounded-2xl text-lg hover:bg-blue-800 transition"
         >
-          Confirmar receta
+          Confirmar almuerzo
         </button>
       </div>
+
+      {showDetails && selectedItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-sm">
+            <h2 className="text-xl font-bold text-center mb-4 text-gray-800">
+              {selectedItem.nombre} (100g por unidad)
+            </h2>
+
+            <label className="block mb-4 text-gray-700 font-medium">
+              Cantidad (x100g):
+              <input
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => handleQuantityChange(e.target.value)}
+                className="w-full border border-black text-black rounded-xl p-2 mt-1"
+              />
+            </label>
+
+            <div className="grid grid-cols-2 gap-3 text-sm mb-6">
+              <div className="text-orange-500 font-semibold"><strong>Calorías:</strong> {nutrients.calorias} kcal</div>
+              <div className="text-green-600 font-semibold"><strong>Proteínas:</strong> {nutrients.proteinas} g</div>
+              <div className="text-blue-600 font-semibold"><strong>Carbohidratos:</strong> {nutrients.carbohidratos} g</div>
+              <div className="text-red-600 font-semibold"><strong>Grasas:</strong> {nutrients.grasas} g</div>
+            </div>
+
+            <div className="flex justify-between">
+              <button
+                className="px-4 py-2 bg-gray-800 text-white rounded-xl hover:bg-black"
+                onClick={() => setShowDetails(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-4 py-2 bg-blue-700 text-white rounded-xl hover:bg-blue-800"
+                onClick={handleSave}
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <BottomNavBar active="Meals" />
     </div>
   )
 }
