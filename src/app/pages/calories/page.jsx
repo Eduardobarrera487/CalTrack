@@ -8,6 +8,9 @@ import CaloriesCard from "@/app/_components/CaloriesCard";
 import ProgressCard from "@/app/_components/ProgressCard";
 import WeightRegister from "@/app/_components/WeightRegister";
 
+// Función fuera del componente
+
+
 export default function CaloriesPage() {
   const [userId, setUserId] = useState(null);
   const [pesoActual, setPesoActual] = useState(0);
@@ -16,6 +19,7 @@ export default function CaloriesPage() {
   const [caloriasQuemadas, setCaloriasQuemadas] = useState(0);
   const [objetivo, setObjetivo] = useState("");
   const [cardData, setCardData] = useState(null);
+    
 
   useEffect(() => {
     cargarDatos();
@@ -80,6 +84,7 @@ export default function CaloriesPage() {
       grasas: Math.round(grasas),
       consumidas: Math.round(consumidas),
     });
+
 
     // Obtener el último peso registrado
     const { data: pesos } = await supabase
@@ -151,11 +156,15 @@ export default function CaloriesPage() {
     setDiferenciaMes(+(pesoInicialMes - nuevoPeso).toFixed(1));
   };
 
+  
   const getFirstDayOfMonth = () => {
     const dt = new Date();
     dt.setDate(1);
     return dt.toISOString().split("T")[0];
   };
+
+  // Ejemplo de uso dentro del componente:
+  // const { objetivo, pesoInicialMes } = getObjetivoYPesoInicial(objetivo, pesoInicialMes);
 
   return (
     <div className="min-h-screen bg-white flex flex-col pb-20 items-center">
@@ -183,3 +192,8 @@ export default function CaloriesPage() {
     </div>
   );
 }
+
+// ...dentro o fuera del componente...
+
+
+
