@@ -204,7 +204,7 @@ export default function Diary() {
         </div>
       )}
 
-      <BottomNavBar />
+      <BottomNavBar active='Meals' />
     </div>
   )
 }
