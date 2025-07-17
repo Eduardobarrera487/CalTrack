@@ -64,18 +64,18 @@ export default function WeightRegister({ userId, onPesoGuardado }) {
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 shadow-md w-80 space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Registrar nuevo peso</h3>
+            <h3 className="text-lg font-semibold text-black">Registrar nuevo peso</h3>
             <input
               type="number"
               value={nuevoPeso}
               onChange={(e) => setNuevoPeso(e.target.value)}
               placeholder="Ej. 160.5"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900 text-black placeholder:text-gray-400"
             />
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700"
+                className="px-4 py-2 text-sm text-black hover:text-gray-700"
               >
                 Cancelar
               </button>
