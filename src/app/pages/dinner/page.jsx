@@ -156,7 +156,7 @@ export default function Dinner() {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4 pb-36">
         {filteredItems.map(item => (
           <div key={item.id} className="bg-gray-100 rounded-2xl p-3 shadow hover:shadow-md transition">
             {item.image_url && (
@@ -177,13 +177,13 @@ export default function Dinner() {
         ))}
       </div>
 
-      <div className="mt-6 px-4 pb-24">
-        <button
-          onClick={handleConfirm}
-          className="w-full bg-blue-900 text-white py-3 rounded-2xl text-lg hover:bg-blue-800 transition"
-        >
-          Confirmar cena
-        </button>
+      <div className="mt-6 fixed bottom-17 left-0 right-0 px-4 z-50 max-w-[430px] mx-auto">
+          <button
+            onClick={handleConfirm}
+            className="w-full bg-blue-900 text-white py-3 rounded-full text-lg hover:bg-blue-800 transition position-aboslute bottom-0 z-10 flex items-center justify-center"
+          >
+            Confirmar cena
+          </button>
       </div>
 
       {showDetails && selectedItem && (
@@ -219,7 +219,7 @@ export default function Dinner() {
                 Cancelar
               </button>
               <button
-                className="px-4 py-2 bg-blue-700 text-white rounded-xl hover:bg-blue-800"
+                className="px-4 py-2 bg-blue-700 text-white rounded-xl hover:bg-blue-800 "
                 onClick={handleSave}
               >
                 Guardar
