@@ -5,6 +5,7 @@ import Logo from '@/app/_components/caltrackLogo';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../../../utils/supabase/client';
 import { useRegister } from '@/app/_context/RegisterContext';
+import { isObjetivoPerderPeso, isObjetivoGanarPeso } from '@/app/_constants/objectives';
 
 function calcularMacros({ peso, altura, edad, genero, actividad_fisica, objetivo }) {
     // Convertir peso de libras a kilogramos
@@ -31,12 +32,15 @@ function calcularMacros({ peso, altura, edad, genero, actividad_fisica, objetivo
 
     let calorias = tmb * factor;
 
-    // Ajuste por objetivo
-    let objetivoMacros = { p: 0.3, c: 0.4, g: 0.3 }; // default
-    if (objetivo && objetivo.toLowerCase().includes("perder")) {
+    // Ajuste por objetivo usando valores estandarizados
+    let objetivoMacros = { p: 0.3, c: 0.4, g: 0.3 }; // default para mantener peso
+    
+    if (isObjetivoPerderPeso(objetivo)) {
+        // Perder peso o definir músculo
         calorias -= 300;
         objetivoMacros = { p: 0.35, c: 0.35, g: 0.3 };
-    } else if (objetivo && objetivo.toLowerCase().includes("ganar")) {
+    } else if (isObjetivoGanarPeso(objetivo)) {
+        // Ganar peso o ganar músculo
         calorias += 300;
         objetivoMacros = { p: 0.25, c: 0.5, g: 0.25 };
     }

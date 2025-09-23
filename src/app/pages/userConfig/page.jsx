@@ -4,9 +4,11 @@ import ReverseArrowButton from "@/app/_components/ReverseArrowButton";
 import Sidebar from "@/app/_components/Sidebar";
 import CustomButton from "@/app/_components/button";
 import CustomInput from "@/app/_components/input";
+import ComboBox from "@/app/_components/ComboBox";
 import BottomNavBar from "@/app/_components/BottomNavBar";
 import LogoutBtn from "@/app/_components/logoutBtn";
 import { createClient } from "../../../../utils/supabase/client";
+import { OBJETIVO_OPTIONS } from "@/app/_constants/objectives";
 
 export default function UserConfig() {
   const supabase = createClient();
@@ -372,16 +374,14 @@ export default function UserConfig() {
               />
             </div>
             <div>
-              <label className="block text-gray-700 text-sm mb-1" htmlFor="objetivo">
-                Objetivo
-              </label>
-              <CustomInput
+              <ComboBox
                 id="objetivo"
-                type="text"
-                placeholder="Objetivo"
-                className="w-full"
+                label="Objetivo"
+                options={OBJETIVO_OPTIONS}
                 value={objetivo}
-                onChange={(e) => setObjetivo(e.target.value)}
+                onChange={(value) => setObjetivo(value)}
+                placeholder="Selecciona tu objetivo"
+                className="w-full"
               />
             </div>
             <div>
