@@ -128,7 +128,7 @@ export default function Dinner() {
   }
 
   return (
-    <div className="max-w-[430px] mx-auto bg-white min-h-screen p-4 font-sans">
+    <div className="w-full md:pl-30 mx-auto bg-white min-h-screen p-4 font-sans">
       <div className="flex items-center justify-between mb-4">
         <button onClick={() => router.push('/pages/diary')}>
           <ArrowLeft className="w-6 h-6 text-black" />

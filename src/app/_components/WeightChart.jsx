@@ -54,7 +54,7 @@ export default function WeightChart({ history }) {
   }, [history, selected]);
 
   return (
-    <div className="flex flex-col items-center w-full max-w-md gap-4">
+    <div className="flex flex-col items-center w-full gap-4">
       <div className="w-80 h-14 flex justify-between">
         {buttons.map((btn) => (
           <button

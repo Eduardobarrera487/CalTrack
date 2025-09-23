@@ -128,7 +128,7 @@ export default function Breakfast() {
   }
 
   return (
-    <div className="max-w-[430px] mx-auto bg-white min-h-screen p-4 font-sans">
+    <div className="md:pl-30 w-full mx-auto bg-white min-h-screen p-4 font-sans">
       <div className="flex items-center justify-between mb-4">
         <button onClick={() => router.push('/pages/diary')}>
           <ArrowLeft className="w-6 h-6 text-black" />

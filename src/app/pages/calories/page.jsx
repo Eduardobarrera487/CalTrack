@@ -19,7 +19,7 @@ export default function CaloriesPage() {
   const [caloriasQuemadas, setCaloriasQuemadas] = useState(0);
   const [objetivo, setObjetivo] = useState("");
   const [cardData, setCardData] = useState(null);
-    
+
 
   useEffect(() => {
     cargarDatos();
@@ -156,7 +156,7 @@ export default function CaloriesPage() {
     setDiferenciaMes(+(pesoInicialMes - nuevoPeso).toFixed(1));
   };
 
-  
+
   const getFirstDayOfMonth = () => {
     const dt = new Date();
     dt.setDate(1);
@@ -167,10 +167,13 @@ export default function CaloriesPage() {
   // const { objetivo, pesoInicialMes } = getObjetivoYPesoInicial(objetivo, pesoInicialMes);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col pb-20 items-center">
-      <HeadBar />
+    <div className="min-h-screen w-full bg-white flex flex-col pb-20 items-center">
+      <div className="md:pl-30 ">
+        <HeadBar />
+      </div>
 
-      <div className="w-full max-w-sm px-4 mt-6 space-y-6">
+
+      <div className="md:pl-30 w-full max-w px-4 mt-6 space-y-6">
         {cardData && <CaloriesCard data={cardData} />}
 
         <ProgressCard
