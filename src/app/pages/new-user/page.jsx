@@ -196,7 +196,7 @@ const NewUser = () => {
 export default NewUser;
 
 
-// This code defines a simple React component for a new user registration page.
-// It includes a form with an input field for the first name and styles it using Tailwind CSS classes.
+// Este código define un componente React simple para una página de registro de nuevo usuario.
+// Incluye un formulario con campos de entrada y usa clases de Tailwind CSS para el estilo.
 
 

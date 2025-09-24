@@ -42,7 +42,7 @@ export default function WeightChart({ history }) {
     if (filtered.length === 1) {
       const original = filtered[0];
       return [
-        { ...original, day: "Prev." },
+        { ...original, day: "Ant." },
         original,
       ];
     }

@@ -160,7 +160,22 @@ Es importante que no pongas texto antes o después.`
         {iaLoading ? (
           <ul className="space-y-3 mb-6 md:grid md:grid-cols-3 md:gap-4">
             {[1, 2, 3].map((_, i) => (
-              <li key={i} className="border p-4 rounded-md bg-blue-50 animate-pulse h-36"></li>
+              <li key={i} className="border border-gray-200 rounded-lg bg-blue-50 animate-pulse min-h-[200px]">
+                <div className="p-5 flex flex-col h-full">
+                  <div className="flex-1 mb-4">
+                    <div className="h-6 bg-gray-300 rounded mb-3"></div>
+                    <div className="space-y-2">
+                      <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                      <div className="h-4 bg-gray-300 rounded w-2/3"></div>
+                      <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                      <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                  <div className="pt-3 border-t border-gray-200">
+                    <div className="h-8 bg-gray-300 rounded"></div>
+                  </div>
+                </div>
+              </li>
             ))}
           </ul>
         ) : iaRecipes.length > 0 ? (
@@ -168,23 +183,31 @@ Es importante que no pongas texto antes o después.`
             {iaRecipes.map((receta, i) => {
               const yaEnMisRecetas = misRecetas.some(r => r.nombre === receta.nombre)
               return (
-                <li key={i} className="border p-4 rounded-md bg-blue-50 flex flex-col justify-between h-36">
-                  <div>
-                    <p className="font-semibold mb-2">{receta.nombre}</p>
-                    <p className="text-sm text-gray-600">
-                      Calorías: {receta.calorias ?? 'N/A'} kcal<br />
-                      Proteínas: {receta.proteinas ?? 'N/A'} g<br />
-                      Carbohidratos: {receta.carbohidratos ?? 'N/A'} g<br />
-                      Grasas: {receta.grasas ?? 'N/A'} g
-                    </p>
+                <li key={i} className="border border-gray-200 rounded-lg bg-blue-50 shadow-sm hover:shadow-md transition-shadow duration-200 h-auto min-h-[200px]">
+                  <div className="p-5 flex flex-col h-full">
+                    <div className="flex-1 mb-4">
+                      <p className="font-semibold text-lg mb-3 text-gray-800 leading-tight">{receta.nombre}</p>
+                      <div className="text-sm text-gray-600 space-y-1">
+                        <p><span className="font-medium">Calorías:</span> {receta.calorias ?? 'N/A'} kcal</p>
+                        <p><span className="font-medium">Proteínas:</span> {receta.proteinas ?? 'N/A'} g</p>
+                        <p><span className="font-medium">Carbohidratos:</span> {receta.carbohidratos ?? 'N/A'} g</p>
+                        <p><span className="font-medium">Grasas:</span> {receta.grasas ?? 'N/A'} g</p>
+                      </div>
+                    </div>
+                    <div className="pt-3 border-t border-gray-200">
+                      <button
+                        disabled={yaEnMisRecetas}
+                        className={`w-full px-4 py-2 text-sm rounded-lg font-semibold transition-colors duration-200 ${
+                          yaEnMisRecetas 
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                            : 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
+                        }`}
+                        onClick={() => guardarRecetaLocal(receta)}
+                      >
+                        {yaEnMisRecetas ? 'Guardada ✓' : 'Añadir a Mis Recetas'}
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    disabled={yaEnMisRecetas}
-                    className={`mt-2 px-3 py-1 text-sm rounded-lg font-semibold ${yaEnMisRecetas ? 'bg-gray-300 text-white cursor-not-allowed' : 'bg-green-700 text-white hover:bg-green-800'}`}
-                    onClick={() => guardarRecetaLocal(receta)}
-                  >
-                    {yaEnMisRecetas ? 'Guardada' : 'Añadir'}
-                  </button>
                 </li>
               )
             })}
@@ -290,7 +313,7 @@ Es importante que no pongas texto antes o después.`
           </button>
         </div>
       </div>
-      <BottomNavBar active="Workouts" />
+      <BottomNavBar active="Ejercicios" />
 
     </>
   )

@@ -4,14 +4,14 @@ import Link from "next/link";
 import { Home, Coffee, Dumbbell, User, Bot } from "lucide-react";
 
 const tabs = [
-  { name: "Home", href: "/pages/calories", icon: Home },
-  { name: "Meals", href: "/pages/diary", icon: Coffee },
-  { name: "Workouts", href: "/pages/workout", icon: Dumbbell },
-  { name: "IA Chat", href: "/pages/aiChat", icon: Bot },
-  { name: "Profile", href: "/pages/userConfig", icon: User },
+  { name: "Inicio", href: "/pages/calories", icon: Home },
+  { name: "Comidas", href: "/pages/diary", icon: Coffee },
+  { name: "Ejercicios", href: "/pages/workout", icon: Dumbbell },
+  { name: "Chat IA", href: "/pages/aiChat", icon: Bot },
+  { name: "Perfil", href: "/pages/userConfig", icon: User },
 ];
 
-export default function BottomNavBar({ active = "Home" }) {
+export default function BottomNavBar({ active = "Inicio" }) {
   return (
     <>
       {/* Navbar horizontal para móviles */}

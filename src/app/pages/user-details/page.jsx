@@ -54,7 +54,7 @@ const UserDetailsPage = () => {
         const { error: updateError } = await supabase
             .from("perfiles")
             .update({
-                genero: gender === "male" ? "Masculino" : "Femenino",
+                genero: gender === "masculino" ? "Masculino" : "Femenino",
                 actividad_fisica: activity,
                 preferencias: diets,
                 restricciones: restrictions,
@@ -91,9 +91,9 @@ const UserDetailsPage = () => {
                             <input
                                 type="radio"
                                 name="gender"
-                                value="male"
-                                checked={gender === "male"}
-                                onChange={() => setGender("male")}
+                                value="masculino"
+                                checked={gender === "masculino"}
+                                onChange={() => setGender("masculino")}
                                 required
                             />
                             Hombre
@@ -102,9 +102,9 @@ const UserDetailsPage = () => {
                             <input
                                 type="radio"
                                 name="gender"
-                                value="female"
-                                checked={gender === "female"}
-                                onChange={() => setGender("female")}
+                                value="femenino"
+                                checked={gender === "femenino"}
+                                onChange={() => setGender("femenino")}
                                 required
                             />
                             Mujer
@@ -137,8 +137,8 @@ const UserDetailsPage = () => {
                             <input
                                 type="checkbox"
                                 name="diet"
-                                value="vegetarian"
-                                checked={diets.includes("vegetarian")}
+                                value="Vegetariano"
+                                checked={diets.includes("Vegetariano")}
                                 onChange={handleDietChange}
                             />
                             Vegetariano
@@ -147,8 +147,8 @@ const UserDetailsPage = () => {
                             <input
                                 type="checkbox"
                                 name="diet"
-                                value="vegan"
-                                checked={diets.includes("vegan")}
+                                value="Vegano"
+                                checked={diets.includes("Vegano")}
                                 onChange={handleDietChange}
                             />
                             Vegano
@@ -157,8 +157,8 @@ const UserDetailsPage = () => {
                             <input
                                 type="checkbox"
                                 name="diet"
-                                value="pescetarian"
-                                checked={diets.includes("pescetarian")}
+                                value="Pescetariano"
+                                checked={diets.includes("Pescetariano")}
                                 onChange={handleDietChange}
                             />
                             Pescetariano
@@ -174,8 +174,8 @@ const UserDetailsPage = () => {
                             <input
                                 type="checkbox"
                                 name="restriction"
-                                value="gluten-free"
-                                checked={restrictions.includes("gluten-free")}
+                                value="sin-gluten"
+                                checked={restrictions.includes("sin-gluten")}
                                 onChange={handleRestrictionChange}
                             />
                             Sin Gluten
@@ -184,8 +184,8 @@ const UserDetailsPage = () => {
                             <input
                                 type="checkbox"
                                 name="restriction"
-                                value="lactose-free"
-                                checked={restrictions.includes("lactose-free")}
+                                value="sin-lactosa"
+                                checked={restrictions.includes("sin-lactosa")}
                                 onChange={handleRestrictionChange}
                             />
                             Sin Lactosa
@@ -194,8 +194,8 @@ const UserDetailsPage = () => {
                             <input
                                 type="checkbox"
                                 name="restriction"
-                                value="nut-free"
-                                checked={restrictions.includes("nut-free")}
+                                value="sin-nueces"
+                                checked={restrictions.includes("sin-nueces")}
                                 onChange={handleRestrictionChange}
                             />
                             Sin Nueces

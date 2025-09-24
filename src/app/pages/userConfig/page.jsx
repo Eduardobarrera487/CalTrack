@@ -32,7 +32,7 @@ export default function UserConfig() {
   const [preferencias, setPreferencias] = useState([]);
 
   // Restricciones (checkboxes)
-  const restriccionesOpciones = ["gluten-free", "lactose-free", "nut-free"];
+  const restriccionesOpciones = ["sin-gluten", "sin-lactosa", "sin-nueces"];
   const [restricciones, setRestricciones] = useState([]);
 
   // Mensajes y loading
@@ -266,7 +266,7 @@ export default function UserConfig() {
 
 
       </div>
-      <BottomNavBar active="Profile" />
+      <BottomNavBar active="Perfil" />
 
     </>
   );

@@ -232,7 +232,7 @@ export default function Lunch() {
 
       
     </div>
-    <BottomNavBar active="Meals" />
+    <BottomNavBar active="Comidas" />
     </>
   )
 }
