@@ -22,6 +22,11 @@ export default function AddRecipePage() {
       return
     }
 
+    if (!preparacion.trim()) {
+      alert('La preparación es obligatoria')
+      return
+    }
+
     const { data: userData, error: userError } = await supabase.auth.getUser()
     const usuario_id = userData?.user?.id
 
@@ -47,7 +52,7 @@ export default function AddRecipePage() {
 
     const { data, error } = await supabase
       .from('recetas')
-      .insert([{ nombre, fuente, tiempo, porciones, calificacion, receta }])
+      .insert([{ nombre, fuente, tiempo, porciones, calificacion, receta: preparacion }])
       .select()
       .single()
 
@@ -61,7 +66,7 @@ export default function AddRecipePage() {
   }
 
   return (
-    <div className="max-w-[430px] mx-auto p-6 min-h-screen bg-white text-black">
+    <div className="md:p-20 mx-auto p-6 min-h-screen bg-white text-black">
       <button
         onClick={() => router.push('/pages/recipes')}
         className="mb-4 text-blue-700 hover:text-blue-900 font-semibold"
@@ -125,7 +130,7 @@ export default function AddRecipePage() {
             onChange={(e) => setPreparacion(e.target.value)}
             className="w-full border rounded p-2 text-black"
             rows={5}
-            placeholder="Escribe aquí la preparación (no se guarda en la base de datos)"
+            placeholder="Escribe aquí los pasos de preparación de la receta"
           />
         </div>
 
