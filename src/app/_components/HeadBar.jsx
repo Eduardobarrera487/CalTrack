@@ -8,7 +8,7 @@ export default function HeadBar() {
   useEffect(() => {
     const now = new Date();
     const options = { month: 'short', day: 'numeric' };
-    const formattedDate = `Today, ${now.toLocaleDateString('en-US', options)}`;
+    const formattedDate = `Hoy, ${now.toLocaleDateString('es-ES', options)}`;
     setCurrentDate(formattedDate);
   }, []);
 

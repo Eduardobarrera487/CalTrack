@@ -31,7 +31,7 @@ export default function WeightChart({ history }) {
     const filtered = history
       .filter((item) => new Date(item.fecha) >= pastDate)
       .map((item) => ({
-        day: new Date(item.fecha).toLocaleDateString("en-US", {
+        day: new Date(item.fecha).toLocaleDateString("es-ES", {
           month: "short",
           day: "numeric",
         }),
@@ -44,7 +44,7 @@ export default function WeightChart({ history }) {
       return [
         {
           ...original,
-          day: "Prev.",
+          day: "Ant.",
         },
         original,
       ];

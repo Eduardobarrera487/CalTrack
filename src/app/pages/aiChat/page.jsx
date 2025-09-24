@@ -120,7 +120,7 @@ export default function AiChat() {
         </div>
 
       </div>
-      <BottomNavBar active="IA Chat" />
+      <BottomNavBar active="Chat IA" />
 
     </>
   );

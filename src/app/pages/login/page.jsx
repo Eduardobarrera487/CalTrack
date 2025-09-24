@@ -85,11 +85,8 @@ export default function Login() {
                     <Link href="/pages/forgot-password" className="hover:underline">
                         ¿Olvidó su contraseña?
                     </Link>
-                    <Link href="/pages/new-user" className="hover:underline">
+                    <Link href="/pages/new-user" className="hover:underline hover:text-blue-500">
                         Registrarse
-                    </Link>
-                    <Link href="/pages/aiChat">
-                        <span className="hover:underline">Chat with AI</span>
                     </Link>
                 </div>
             </form>

@@ -36,7 +36,7 @@ const ForgotPasswordPage = () => {
         <button
           className="absolute left-0 top-1 flex items-center gap-2 text-gray-600 hover:text-gray-900"
           onClick={() => router.back()}
-          aria-label="Go back"
+          aria-label="Volver"
         >
           <ArrowLeft size={24} />
           <span>Regresar</span>

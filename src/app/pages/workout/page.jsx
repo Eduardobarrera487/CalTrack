@@ -228,7 +228,7 @@ No pongas explicaciones ni texto extra.`
     <div className="flex min-h-screen bg-white">
       {/* Sidebar PC */}
       <div className="hidden md:flex md:flex-col md:w-20 md:py-4 md:border-r md:border-gray-200">
-        <BottomNavBar active="Workouts" />
+        <BottomNavBar active="Ejercicios" />
       </div>
 
       {/* Contenido principal */}
@@ -350,7 +350,7 @@ No pongas explicaciones ni texto extra.`
       </div>
 
       {/* Navbar inferior solo móviles */}
-      <BottomNavBar active="Workouts" />
+      <BottomNavBar active="Ejercicios" />
     </div>
   )
 }
