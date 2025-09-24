@@ -80,7 +80,7 @@ export default function AddIngredientsClient() {
   }
 
   return (
-    <div className="max-w-[430px] mx-auto p-6 min-h-screen text-black bg-white">
+    <div className="mx-auto p-6 md:p-20 min-h-screen text-black bg-white">
       <button
         onClick={() => router.push('/pages/add-recipe')}
         className="mb-4 text-blue-700 hover:text-blue-900 font-semibold"
