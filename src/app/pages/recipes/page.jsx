@@ -68,7 +68,7 @@ Es importante que no pongas texto antes o después.`
     const fetchRecipesWithNutrition = async () => {
       const { data, error } = await supabase
         .from('recetas')
-        .select(`id, nombre, fuente, receta_ingredientes (cantidad, ingredientes (calorias, proteinas, carbohidratos, grasas, nombre))`)
+        .select(`id, nombre, fuente, receta, receta_ingredientes (cantidad, ingredientes (calorias, proteinas, carbohidratos, grasas, nombre))`)
         .order('nombre', { ascending: true })
 
       if (error) {
@@ -84,10 +84,11 @@ Es importante que no pongas texto antes o después.`
         let totalGrasas = 0
         receta.receta_ingredientes.forEach(({ cantidad, ingredientes }) => {
           if (ingredientes) {
-            totalCalorias += (ingredientes.calorias || 0) * cantidad
-            totalProteinas += (ingredientes.proteinas || 0) * cantidad
-            totalCarbohidratos += (ingredientes.carbohidratos || 0) * cantidad
-            totalGrasas += (ingredientes.grasas || 0) * cantidad
+            // Los valores nutricionales están por 100g, así que dividimos por 100 y multiplicamos por la cantidad
+            totalCalorias += ((ingredientes.calorias || 0) / 100) * cantidad
+            totalProteinas += ((ingredientes.proteinas || 0) / 100) * cantidad
+            totalCarbohidratos += ((ingredientes.carbohidratos || 0) / 100) * cantidad
+            totalGrasas += ((ingredientes.grasas || 0) / 100) * cantidad
           }
         })
         return {
@@ -241,7 +242,6 @@ Es importante que no pongas texto antes o después.`
         <h2 className="text-xl md:text-2xl font-semibold mt-10 mb-3">Lista de recetas</h2>
         <ul className="flex flex-col gap-6 md:flex-row md:flex-wrap md:gap-8 md:p-10">
           {recipes.map((receta) => {
-            const preparacionLocal = localStorage.getItem(`preparacion_${receta.id}`) || 'No disponible'
             return (
               <li
                 key={receta.id}
@@ -294,7 +294,7 @@ Es importante que no pongas texto antes o después.`
                       </ul>
 
                       <h4 className="font-semibold mb-1">Preparación:</h4>
-                      <p className="whitespace-pre-wrap">{preparacionLocal}</p>
+                      <p className="whitespace-pre-wrap">{receta.receta || 'No disponible'}</p>
                     </div>
                   </div>
                 )}
