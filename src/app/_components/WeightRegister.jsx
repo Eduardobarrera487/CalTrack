@@ -17,28 +17,14 @@ export default function WeightRegister({ userId, onPesoGuardado }) {
     setLoading(true);
     const fecha = new Date().toISOString().split("T")[0];
 
-    const { data: existente } = await supabase
-      .from("peso_progreso")
-      .select("id")
-      .eq("usuario_id", userId)
-      .eq("fecha", fecha)
-      .single();
+    const { error } = await supabase
+  .from("peso_progreso")
+  .insert({
+    usuario_id: userId,
+    peso: pesoFloat,
+    fecha: new Date().toISOString(), // 👈 incluye hora y fecha exacta
+  });
 
-    let error;
-    if (existente) {
-      ({ error } = await supabase
-        .from("peso_progreso")
-        .update({ peso: pesoFloat })
-        .eq("id", existente.id));
-    } else {
-      ({ error } = await supabase
-        .from("peso_progreso")
-        .insert({
-          usuario_id: userId,
-          peso: pesoFloat,
-          fecha,
-        }));
-    }
 
     setLoading(false);
 
