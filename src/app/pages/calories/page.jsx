@@ -19,7 +19,7 @@ export default function CaloriesPage() {
   const [caloriasQuemadas, setCaloriasQuemadas] = useState(0);
   const [objetivo, setObjetivo] = useState("");
   const [cardData, setCardData] = useState(null);
-    
+
 
   useEffect(() => {
     cargarDatos();
@@ -129,68 +129,85 @@ export default function CaloriesPage() {
       .eq("id", user.id)
       .single();
 
-    setObjetivo(perfil?.objetivo ?? "");
 
-    // Calorías quemadas hoy
-    const { data: entrenamientos } = await supabase
-      .from("entrenamientos")
-      .select("calorias_quemadas")
-      .eq("usuario_id", user.id)
-      .eq("fecha", todayStr);
-
-    setCaloriasQuemadas(
-      entrenamientos?.reduce((acc, e) => acc + (e.calorias_quemadas ?? 0), 0) || 0
-    );
-  };
-
-  // Esta función actualiza el peso actual al registrar un nuevo peso
-  const actualizarPeso = async (nuevoPeso, nuevaFecha) => {
-    setPesoActual(nuevoPeso);
-
-    if (!pesoInicialMes || nuevaFecha <= getFirstDayOfMonth()) {
-      setPesoInicialMes(nuevoPeso);
-      setDiferenciaMes(0);
-      return;
+    let objetivoNormalizado = (objetivo) => {
+      switch(objetivo) {
+      case "perder_peso": return 'Perder Peso'
+      case "mantener_peso": return 'Mantener Peso'
+      case "ganar_peso": return 'Ganar Peso'
+      case "ganar_musculo": return 'Ganar Músculo'
+      case "definir_musculo": return 'Defini Músculo'
+      default:
+        return objetivo
     }
+  }
 
-    setDiferenciaMes(+(pesoInicialMes - nuevoPeso).toFixed(1));
-  };
 
-  
-  const getFirstDayOfMonth = () => {
-    const dt = new Date();
-    dt.setDate(1);
-    return dt.toISOString().split("T")[0];
-  };
+  setObjetivo(objetivoNormalizado(perfil?.objetivo ?? ""));
 
-  // Ejemplo de uso dentro del componente:
-  // const { objetivo, pesoInicialMes } = getObjetivoYPesoInicial(objetivo, pesoInicialMes);
+  // Calorías quemadas hoy
+  const { data: entrenamientos } = await supabase
+    .from("entrenamientos")
+    .select("calorias_quemadas")
+    .eq("usuario_id", user.id)
+    .eq("fecha", todayStr);
 
-  return (
-    <div className="min-h-screen bg-white flex flex-col pb-20 items-center">
-      <HeadBar />
-
-      <div className="w-full max-w-sm px-4 mt-6 space-y-6">
-        {cardData && <CaloriesCard data={cardData} />}
-
-        <ProgressCard
-          pesoActual={pesoActual}
-          objetivo={objetivo}
-          diferenciaMes={diferenciaMes}
-          caloriasQuemadas={Math.round(caloriasQuemadas)}
-        />
-
-        {userId && (
-          <WeightRegister
-            userId={userId}
-            onPesoGuardado={(nuevoPeso, fecha) => actualizarPeso(nuevoPeso, fecha)}
-          />
-        )}
-      </div>
-
-      <BottomNavBar active="Home" />
-    </div>
+  setCaloriasQuemadas(
+    entrenamientos?.reduce((acc, e) => acc + (e.calorias_quemadas ?? 0), 0) || 0
   );
+};
+
+// Esta función actualiza el peso actual al registrar un nuevo peso
+const actualizarPeso = async (nuevoPeso, nuevaFecha) => {
+  setPesoActual(nuevoPeso);
+
+  if (!pesoInicialMes || nuevaFecha <= getFirstDayOfMonth()) {
+    setPesoInicialMes(nuevoPeso);
+    setDiferenciaMes(0);
+    return;
+  }
+
+  setDiferenciaMes(+(pesoInicialMes - nuevoPeso).toFixed(1));
+};
+
+
+const getFirstDayOfMonth = () => {
+  const dt = new Date();
+  dt.setDate(1);
+  return dt.toISOString().split("T")[0];
+};
+
+// Ejemplo de uso dentro del componente:
+// const { objetivo, pesoInicialMes } = getObjetivoYPesoInicial(objetivo, pesoInicialMes);
+
+return (
+  <div className="min-h-screen w-full bg-white flex flex-col pb-20 items-center">
+    <div className="md:pl-30 ">
+      <HeadBar />
+    </div>
+
+
+    <div className="md:pl-30 w-full max-w px-4 mt-6 space-y-6">
+      {cardData && <CaloriesCard data={cardData} />}
+
+      <ProgressCard
+        pesoActual={pesoActual}
+        objetivo={objetivo}
+        diferenciaMes={diferenciaMes}
+        caloriasQuemadas={Math.round(caloriasQuemadas)}
+      />
+
+      {userId && (
+        <WeightRegister
+          userId={userId}
+          onPesoGuardado={(nuevoPeso, fecha) => actualizarPeso(nuevoPeso, fecha)}
+        />
+      )}
+    </div>
+
+    <BottomNavBar active="Home" />
+  </div>
+);
 }
 
 // ...dentro o fuera del componente...

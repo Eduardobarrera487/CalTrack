@@ -4,13 +4,14 @@ import ReverseArrowButton from "@/app/_components/ReverseArrowButton";
 import Sidebar from "@/app/_components/Sidebar";
 import CustomButton from "@/app/_components/button";
 import CustomInput from "@/app/_components/input";
+import ComboBox from "@/app/_components/ComboBox";
 import BottomNavBar from "@/app/_components/BottomNavBar";
 import LogoutBtn from "@/app/_components/logoutBtn";
 import { createClient } from "../../../../utils/supabase/client";
+import { OBJETIVO_OPTIONS } from "@/app/_constants/objectives";
 
 export default function UserConfig() {
   const supabase = createClient();
-
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Usuario
@@ -43,24 +44,16 @@ export default function UserConfig() {
   // Cargar datos actuales del usuario y perfil
   useEffect(() => {
     const fetchUserAndProfile = async () => {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
-
+      const { data: { user }, error } = await supabase.auth.getUser();
       if (error) {
         setMessageUsuario({ type: "error", text: "Error al obtener usuario." });
         return;
       }
-
       if (user) {
         setEmail(user.email ?? "");
-        // Obtener perfil
         const { data: perfil, error: perfilError } = await supabase
           .from("perfiles")
-          .select(
-            "nombre, edad, peso, altura, genero, objetivo, actividad_fisica, preferencias, restricciones"
-          )
+          .select("nombre, edad, peso, altura, genero, objetivo, actividad_fisica, preferencias, restricciones")
           .eq("id", user.id)
           .single();
 
@@ -77,49 +70,37 @@ export default function UserConfig() {
         setObjetivo(perfil.objetivo || "");
         setActividadFisica(perfil.actividad_fisica || "sedentario");
 
-        // Preferencias y restricciones pueden venir como array o JSON string, aseguremos que sean arrays
-        const prefs =
-          typeof perfil.preferencias === "string"
-            ? JSON.parse(perfil.preferencias)
-            : perfil.preferencias || [];
-        const restr =
-          typeof perfil.restricciones === "string"
-            ? JSON.parse(perfil.restricciones)
-            : perfil.restricciones || [];
-
+        const prefs = typeof perfil.preferencias === "string"
+          ? JSON.parse(perfil.preferencias)
+          : perfil.preferencias || [];
+        const restr = typeof perfil.restricciones === "string"
+          ? JSON.parse(perfil.restricciones)
+          : perfil.restricciones || [];
         setPreferencias(prefs);
         setRestricciones(restr);
       }
     };
-
     fetchUserAndProfile();
   }, [supabase]);
 
-  // Manejar checkboxes preferencias
   const togglePreferencia = (val) => {
     setPreferencias((prev) =>
       prev.includes(val) ? prev.filter((p) => p !== val) : [...prev, val]
     );
   };
 
-  // Manejar checkboxes restricciones
   const toggleRestriccion = (val) => {
     setRestricciones((prev) =>
       prev.includes(val) ? prev.filter((r) => r !== val) : [...prev, val]
     );
   };
 
-  // Actualizar usuario (email, password, nombre)
   const handleSubmitUsuario = async (e) => {
     e.preventDefault();
     setLoadingUsuario(true);
     setMessageUsuario(null);
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
       setMessageUsuario({ type: "error", text: "Usuario no autenticado." });
       setLoadingUsuario(false);
@@ -131,12 +112,8 @@ export default function UserConfig() {
       });
     }
 
-    // Actualizar email (opcional)
     if (email !== user.email) {
-      const { error: emailError } = await supabase.auth.updateUser({
-        email,
-      });
-
+      const { error: emailError } = await supabase.auth.updateUser({ email });
       if (emailError) {
         setMessageUsuario({ type: "error", text: `Error al actualizar correo: ${emailError.message}` });
         setLoadingUsuario(false);
@@ -144,17 +121,13 @@ export default function UserConfig() {
       } else {
         setMessageUsuario({
           type: "info",
-          text: "Se ha enviado un correo para confirmar el cambio de email. Por favor revisa tu correo.",
+          text: "Se ha enviado un correo para confirmar el cambio de email. Revisa tu correo.",
         });
       }
     }
 
-    // Actualizar contraseña (si está relleno)
     if (password.trim().length > 0) {
-      const { error: passError } = await supabase.auth.updateUser({
-        password,
-      });
-
+      const { error: passError } = await supabase.auth.updateUser({ password });
       if (passError) {
         setMessageUsuario({ type: "error", text: `Error al actualizar contraseña: ${passError.message}` });
         setLoadingUsuario(false);
@@ -167,7 +140,6 @@ export default function UserConfig() {
       }
     }
 
-    // Actualizar nombre en tabla perfiles
     const { error: perfilError } = await supabase
       .from("perfiles")
       .upsert({ id: user.id, nombre: name }, { onConflict: "id" });
@@ -178,30 +150,22 @@ export default function UserConfig() {
       return;
     }
 
-    setPassword(""); // Limpiar contraseña
+    setPassword("");
     setLoadingUsuario(false);
   };
 
-  // Actualizar perfil (edad, peso, altura, genero, objetivo, actividad, preferencias, restricciones)
   const handleSubmitPerfil = async (e) => {
     e.preventDefault();
     setLoadingPerfil(true);
     setMessagePerfil(null);
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
       setMessagePerfil({ type: "error", text: "Usuario no autenticado." });
       setLoadingPerfil(false);
       return;
     }
 
-   
-
-    // En la actualización del perfil:
     const perfilData = {
       id: user.id,
       edad: edad ? Number(edad) : null,
@@ -210,14 +174,13 @@ export default function UserConfig() {
       genero,
       objetivo,
       actividad_fisica: actividadFisica,
-      preferencias,  // directamente array
-      restricciones, // directamente array
+      preferencias,
+      restricciones,
     };
 
     const { error: perfilError } = await supabase
       .from("perfiles")
       .upsert(perfilData, { onConflict: "id" });
-
 
     if (perfilError) {
       setMessagePerfil({ type: "error", text: "Error al actualizar perfil." });
@@ -230,234 +193,81 @@ export default function UserConfig() {
   };
 
   return (
-    <div className="flex flex-col bg-white min-h-screen p-2 pt-8 gap-3 font-[family-name:var(--font-geist-sans)]">
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <header className="flex flex-row gap-5 items-center mb-4 border-b border-gray-300 shadow-lg shadow-gray-200">
-        <ReverseArrowButton string="/pages/calories" />
-        <nav className="flex items-center gap-3">
-          <h1 className="text-[1rem] font-bold text-start mb-4 text-black ">
-            Configuración de usuario
-          </h1>
-        </nav>
-      </header>
+    <>
+      <div className="md:px-30 px-3 flex flex-col bg-white min-h-screen font-[family-name:var(--font-geist-sans)]">
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <header className="flex flex-row gap-5 items-center p-4 border-b border-gray-300 shadow-lg shadow-gray-200 mt-5">
+          <ReverseArrowButton string="/pages/calories" />
+          <h1 className="text-lg font-bold text-black">Configuración de usuario</h1>
+        </header>
 
-      <main className="flex-1 overflow-y-auto p-4 max-w-md mx-auto">
-        {/* Formulario para usuario */}
-        <section className="bg-gray-50 rounded-xl shadow-md p-6 mb-8">
-          <h2 className="text-lg font-semibold mb-4 text-gray-700">Datos de Usuario</h2>
-          <form className="flex flex-col gap-4" onSubmit={handleSubmitUsuario}>
-            <div>
-              <label className="block text-gray-700 text-sm mb-1" htmlFor="name">
-                Nombre
-              </label>
-              <CustomInput
-                id="name"
-                type="text"
-                placeholder="Tu nombre"
-                className="w-full"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 text-sm mb-1" htmlFor="email">
-                Correo electrónico
-              </label>
-              <CustomInput
-                id="email"
-                type="email"
-                placeholder="correo@ejemplo.com"
-                className="w-full"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 text-sm mb-1" htmlFor="password">
-                Nueva contraseña
-              </label>
-              <CustomInput
-                id="password"
-                type="password"
-                placeholder="Nueva contraseña"
-                className="w-full"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+        <main className="flex-1 overflow-y-auto p-4 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Usuario */}
+          <section className="bg-gray-50 rounded-xl shadow-md p-6">
+            <h2 className="text-lg font-semibold mb-4 text-gray-700">Datos de Usuario</h2>
+            <form className="flex flex-col gap-4" onSubmit={handleSubmitUsuario}>
+              <CustomInput id="name" type="text" placeholder="Tu nombre" value={name} onChange={(e) => setName(e.target.value)} required />
+              <CustomInput id="email" type="email" placeholder="correo@ejemplo.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <CustomInput id="password" type="password" placeholder="Nueva contraseña" value={password} onChange={(e) => setPassword(e.target.value)} />
+              {messageUsuario && <p className={`text-sm ${messageUsuario.type === "error" ? "text-red-600" : messageUsuario.type === "info" ? "text-blue-600" : "text-green-600"}`}>{messageUsuario.text}</p>}
+              <CustomButton type="submit" className="w-full text-white" text={loadingUsuario ? "Guardando..." : "Guardar Cambios"} disabled={loadingUsuario} />
+            </form>
+          </section>
 
-            {messageUsuario && (
-              <p
-                className={`text-sm ${messageUsuario.type === "error"
-                    ? "text-red-600"
-                    : messageUsuario.type === "info"
-                      ? "text-blue-600"
-                      : "text-green-600"
-                  }`}
-              >
-                {messageUsuario.text}
-              </p>
-            )}
-
-            <CustomButton
-              type="submit"
-              className="w-full text-white"
-              text={loadingUsuario ? "Guardando..." : "Guardar Cambios"}
-              disabled={loadingUsuario}
-            />
-          </form>
-        </section>
-
-        {/* Formulario para perfil */}
-        <section className="bg-gray-50 rounded-xl shadow-md p-6 mb-8">
-          <h2 className="text-lg font-semibold mb-4 text-gray-700">Perfil</h2>
-          <form className="flex flex-col gap-4" onSubmit={handleSubmitPerfil}>
-            <div>
-              <label className="block text-gray-700 text-sm mb-1" htmlFor="edad">
-                Edad
-              </label>
-              <CustomInput
-                id="edad"
-                type="number"
-                placeholder="Edad"
-                className="w-full"
-                value={edad}
-                onChange={(e) => setEdad(e.target.value)}
-                min={0}
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 text-sm mb-1" htmlFor="peso">
-                Peso (kg)
-              </label>
-              <CustomInput
-                id="peso"
-                type="number"
-                placeholder="Peso en kg"
-                className="w-full"
-                value={peso}
-                onChange={(e) => setPeso(e.target.value)}
-                min={0}
-                step="0.1"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 text-sm mb-1" htmlFor="altura">
-                Altura (cm)
-              </label>
-              <CustomInput
-                id="altura"
-                type="number"
-                placeholder="Altura en cm"
-                className="w-full"
-                value={altura}
-                onChange={(e) => setAltura(e.target.value)}
-                min={0}
-                step="0.1"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 text-sm mb-1" htmlFor="genero">
-                Género
-              </label>
-              <CustomInput
-                id="genero"
-                type="text"
-                placeholder="Género"
-                className="w-full"
-                value={genero}
-                onChange={(e) => setGenero(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 text-sm mb-1" htmlFor="objetivo">
-                Objetivo
-              </label>
-              <CustomInput
-                id="objetivo"
-                type="text"
-                placeholder="Objetivo"
-                className="w-full"
-                value={objetivo}
-                onChange={(e) => setObjetivo(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 text-sm mb-1" htmlFor="actividadFisica">
-                Actividad Física
-              </label>
-              <select
-                id="actividadFisica"
-                className="w-full border border-gray-300 rounded-md p-2 text-gray-700"
-                value={actividadFisica}
-                onChange={(e) => setActividadFisica(e.target.value)}
-              >
+          {/* Perfil */}
+          <section className="bg-gray-50 rounded-xl shadow-md p-6">
+            <h2 className="text-lg font-semibold mb-4 text-gray-700">Perfil</h2>
+            <form className="flex flex-col gap-4" onSubmit={handleSubmitPerfil}>
+              <CustomInput id="edad" type="number" placeholder="Edad" value={edad} onChange={(e) => setEdad(e.target.value)} min={0} />
+              <CustomInput id="peso" type="number" placeholder="Peso en kg" value={peso} onChange={(e) => setPeso(e.target.value)} min={0} step="0.1" />
+              <CustomInput id="altura" type="number" placeholder="Altura en cm" value={altura} onChange={(e) => setAltura(e.target.value)} min={0} step="0.1" />
+              <CustomInput id="genero" type="text" placeholder="Género" value={genero} onChange={(e) => setGenero(e.target.value)} />
+              <ComboBox id="objetivo" label="Objetivo" options={OBJETIVO_OPTIONS} value={objetivo} onChange={(value) => setObjetivo(value)} placeholder="Selecciona tu objetivo" />
+              <select id="actividadFisica" className="border border-gray-300 rounded-md p-2 text-gray-700" value={actividadFisica} onChange={(e) => setActividadFisica(e.target.value)}>
                 <option value="sedentario">Sedentario</option>
                 <option value="ligero">Ligero</option>
                 <option value="moderado">Moderado</option>
                 <option value="intenso">Intenso</option>
               </select>
-            </div>
 
-            {/* Preferencias */}
-            <fieldset className="border p-3 rounded-md">
-              <legend className="font-semibold mb-2 text-gray-700">Preferencias</legend>
-              {preferenciasOpciones.map((opcion) => (
-                <label key={opcion} className="inline-flex items-center mr-4 text-gray-700">
-                  <input
-                    type="checkbox"
-                    checked={preferencias.includes(opcion)}
-                    onChange={() => togglePreferencia(opcion)}
-                    className="mr-1 text-gray-700"
-                  />
-                  {opcion}
-                </label>
-              ))}
-            </fieldset>
+              {/* Preferencias */}
+              <fieldset className="border p-3 rounded-md">
+                <legend className="font-semibold mb-2 text-gray-700">Preferencias</legend>
+                {preferenciasOpciones.map((opcion) => (
+                  <label key={opcion} className="inline-flex items-center mr-4 text-gray-700">
+                    <input type="checkbox" checked={preferencias.includes(opcion)} onChange={() => togglePreferencia(opcion)} className="mr-1" />
+                    {opcion}
+                  </label>
+                ))}
+              </fieldset>
 
-            {/* Restricciones */}
-            <fieldset className="border p-3 rounded-md mt-4">
-              <legend className="font-semibold mb-2 text-gray-700">Restricciones</legend>
-              {restriccionesOpciones.map((opcion) => (
-                <label key={opcion} className="inline-flex items-center mr-4 text-gray-700">
-                  <input
-                    type="checkbox"
-                    checked={restricciones.includes(opcion)}
-                    onChange={() => toggleRestriccion(opcion)}
-                    className="mr-1"
-                  />
-                  {opcion}
-                </label>
-              ))}
-            </fieldset>
+              {/* Restricciones */}
+              <fieldset className="border p-3 rounded-md mt-4">
+                <legend className="font-semibold mb-2 text-gray-700">Restricciones</legend>
+                {restriccionesOpciones.map((opcion) => (
+                  <label key={opcion} className="inline-flex items-center mr-4 text-gray-700">
+                    <input type="checkbox" checked={restricciones.includes(opcion)} onChange={() => toggleRestriccion(opcion)} className="mr-1" />
+                    {opcion}
+                  </label>
+                ))}
+              </fieldset>
 
-            {messagePerfil && (
-              <p
-                className={`text-sm mt-3 ${messagePerfil.type === "error"
-                    ? "text-red-600"
-                    : "text-green-600"
-                  }`}
-              >
-                {messagePerfil.text}
-              </p>
-            )}
+              {messagePerfil && <p className={`text-sm mt-3 ${messagePerfil.type === "error" ? "text-red-600" : "text-green-600"}`}>{messagePerfil.text}</p>}
 
-            <CustomButton
-              type="submit"
-              className="w-full mt-4 text-white"
-              text={loadingPerfil ? "Guardando..." : "Guardar Cambios Perfil"}
-              disabled={loadingPerfil}
-            />
-          </form>
-        </section>
+              <CustomButton type="submit" className="w-full mt-4 text-white" text={loadingPerfil ? "Guardando..." : "Guardar Cambios Perfil"} disabled={loadingPerfil} />
+            </form>
+          </section>
 
-        <section className="pb-12">
-          <LogoutBtn />
-        </section>
-      </main>
+          {/* Logout */}
+          <section className="col-span-full mb-25">
+            <LogoutBtn />
+          </section>
+        </main>
+
+
+      </div>
       <BottomNavBar active="Profile" />
-    </div>
+
+    </>
   );
 }

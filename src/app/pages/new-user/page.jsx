@@ -1,10 +1,12 @@
 "use client";
 import React, { useState } from 'react';
 import CustomInput from '@/app/_components/input';
+import ComboBox from '@/app/_components/ComboBox';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../../../utils/supabase/client';
 import { useRegister } from '@/app/_context/RegisterContext';
+import { OBJETIVO_OPTIONS } from '@/app/_constants/objectives';
 
 const NewUser = () => {
     const { registerData, updateRegisterData } = useRegister();
@@ -29,6 +31,11 @@ const NewUser = () => {
         if (e.target.name === "email") {
             setEmailError(false);
         }
+    };
+
+    const handleObjetivoChange = (value) => {
+        setForm({ ...form, objetivo: value });
+        updateRegisterData({ objetivo: value });
     };
 
     const validateEmail = (email) => {
@@ -161,14 +168,13 @@ const NewUser = () => {
                         onChange={handleChange}
                         required
                     />
-                    <CustomInput
-                        type="text"
-                        placeholder="Objetivo"
-                        className="w-full"
-                        name="objetivo"
+                    <ComboBox
+                        options={OBJETIVO_OPTIONS}
                         value={form.objetivo}
-                        onChange={handleChange}
-                        required
+                        onChange={handleObjetivoChange}
+                        placeholder="Selecciona tu objetivo"
+                        className="w-full"
+                        label=""
                     />
                     {error && <div className="text-red-500 text-center">{error}</div>}
                     <button

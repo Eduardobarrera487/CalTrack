@@ -128,7 +128,7 @@ export default function Breakfast() {
   }
 
   return (
-    <div className="max-w-[430px] mx-auto bg-white min-h-screen p-4 font-sans">
+    <div className="md:pl-30 w-full mx-auto bg-white min-h-screen p-4 font-sans">
       <div className="flex items-center justify-between mb-4">
         <button onClick={() => router.push('/pages/diary')}>
           <ArrowLeft className="w-6 h-6 text-black" />
@@ -156,7 +156,7 @@ export default function Breakfast() {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4 mb-36">
         {filteredItems.map(item => (
           <div key={item.id} className="bg-gray-100 rounded-2xl p-3 shadow hover:shadow-md transition">
             {item.image_url && (
@@ -177,12 +177,12 @@ export default function Breakfast() {
         ))}
       </div>
 
-      <div className="mt-6 px-4 pb-24">
+      <div className=" mt-6 fixed bottom-17 left-0 right-0 px-4 z-50 max-w-[430px] mx-auto">
         <button
           onClick={handleConfirm}
-          className="w-full bg-blue-900 text-white py-3 rounded-2xl text-lg hover:bg-blue-800 transition"
+          className="w-full bg-blue-900 text-white py-3 rounded-full text-lg hover:bg-blue-800 transition"
         >
-          Confirmar desayuno
+          Confirmar Desayuno
         </button>
       </div>
 

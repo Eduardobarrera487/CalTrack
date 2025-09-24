@@ -22,8 +22,8 @@ export default async function ProgressPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col pb-20 items-center">
       <ProgressDetailHeader />
-      <div className="w-full max-w-md px-4 mt-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Weight Progress</h2>
+      <div className="w-full px-4 mt-6">
+        <h2 className="md:text-center text-xl font-semibold text-gray-900 mb-4">Weight Progress</h2>
         <WeightChart history={pesos ?? []} />
       </div>
       <BottomNavBar active="Progress" />

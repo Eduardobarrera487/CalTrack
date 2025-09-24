@@ -17,7 +17,7 @@ export default function Sidebar({ open, onClose }) {
         </button>
         <nav className="flex flex-col px-8 mt-8">
           <Link
-            href="/about"
+            href="/pages/about"
             className="text-lg text-gray-700 hover:text-black transition py-4 border-b border-gray-200"
           >
             Sobre nosotros

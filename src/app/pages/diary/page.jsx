@@ -122,7 +122,7 @@ export default function Diary() {
   }
 
   return (
-    <div className="max-w-[430px] w-full mx-auto min-h-screen pb-28 bg-gradient-to-b from-gray-100 via-gray-50 to-gray-100 flex flex-col">
+    <div className="md:pl-30 w-full mx-auto min-h-screen pb-28 bg-gradient-to-b from-gray-100 via-gray-50 to-gray-100 flex flex-col">
       <div className="p-6 space-y-10 flex-grow">
         <header className="space-y-3 text-center bg-gradient-to-t from-[#7DA0CA] via-[#5483B3] to-[#052659] rounded-3xl p-8 shadow-lg text-white">
           <p className="text-lg font-light max-w-xs mx-auto drop-shadow-sm">
