@@ -229,7 +229,7 @@ export default function Dinner() {
         </div>
       )}
 
-      <BottomNavBar active="Meals" />
+      <BottomNavBar active="Comidas" />
     </div>
   )
 }

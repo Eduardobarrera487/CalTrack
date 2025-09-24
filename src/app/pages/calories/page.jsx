@@ -205,7 +205,7 @@ return (
       )}
     </div>
 
-    <BottomNavBar active="Home" />
+    <BottomNavBar active="Inicio" />
   </div>
 );
 }

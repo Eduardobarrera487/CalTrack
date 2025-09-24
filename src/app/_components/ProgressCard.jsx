@@ -7,7 +7,7 @@ export default function ProgressCard({ pesoActual, objetivo, diferenciaMes, calo
   return (
     <div className="w-full bg-white rounded-lg outline outline-gray-200 p-4 space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-medium text-gray-900">Progress</h2>
+        <h2 className="text-xl font-medium text-gray-900">Progreso</h2>
         <Link href="/pages/progress">
           <ArrowRight className="w-4 h-4 text-gray-400 hover:text-gray-600 transition" />
         </Link>
@@ -34,7 +34,7 @@ export default function ProgressCard({ pesoActual, objetivo, diferenciaMes, calo
               ? `+${Math.abs(diferenciaMes)} lbs`
               : "0 lbs"}
           </div>
-          <div className="text-xs text-gray-500">This month</div>
+          <div className="text-xs text-gray-500">Este mes</div>
         </div>
       </div>
 
