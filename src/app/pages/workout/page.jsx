@@ -240,7 +240,7 @@ No pongas explicaciones ni texto extra.`
 
           <div className="bg-gray-200 rounded-2xl p-4 shadow">
             <p className="text-sm text-gray-700">Calorías quemadas hoy</p>
-            <h2 className="text-3xl font-bold text-black">{totalCaloriesToday}</h2>
+            <h2 className="text-3xl font-bold text-black">{totalCaloriesToday} kcal</h2>
 
             <div className="mt-3 w-full bg-gray-300 rounded-full h-4 overflow-hidden">
               <div
@@ -248,7 +248,7 @@ No pongas explicaciones ni texto extra.`
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <p className="text-xs mt-1 text-gray-600">Meta diaria: {calorieGoal ?? '—'} cal</p>
+            <p className="text-xs mt-1 text-gray-600">Meta diaria: {calorieGoal ?? '—'} kcal</p>
           </div>
 
           <div className="flex gap-2">
