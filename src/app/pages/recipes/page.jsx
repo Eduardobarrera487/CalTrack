@@ -245,7 +245,7 @@ Es importante que no pongas texto antes o después.`
             return (
               <li
                 key={receta.id}
-                className="border rounded-lg p-4 flex-1 min-w-[280px] max-w-sm shadow hover:shadow-lg transition"
+                className="border rounded-lg p-4 flex-1 min-w-[280px]  max-w-[284px] shadow hover:shadow-lg transition"
               >
                 <h2 className="text-lg md:text-xl font-semibold mb-1">{receta.nombre}</h2>
                 {receta.fuente && (

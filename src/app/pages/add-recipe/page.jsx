@@ -47,7 +47,7 @@ export default function AddRecipePage() {
 
     const { data, error } = await supabase
       .from('recetas')
-      .insert([{ nombre, fuente, tiempo, porciones, calificacion }])
+      .insert([{ nombre, fuente, tiempo, porciones, calificacion, receta }])
       .select()
       .single()
 
@@ -56,8 +56,6 @@ export default function AddRecipePage() {
       console.error(error)
       return
     }
-
-    localStorage.setItem(`preparacion_${data.id}`, preparacion)
 
     router.push(`/pages/add-ingredients?recetaId=${data.id}`)
   }
